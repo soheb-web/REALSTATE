@@ -1,10 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:marquee/marquee.dart';
+import 'package:realstate/Controller/homeServiceCategoryController.dart';
 import 'package:realstate/pages/propertyCat.page.dart';
+import 'package:shimmer/shimmer.dart';
 import 'createPropertyPage.dart';
 import 'drawer.dart';
 
@@ -1050,9 +1055,14 @@ class PropertyCard extends StatelessWidget {
 
 // ==================== MAIN STATE CLASS ====================
 
-class HomeService extends StatelessWidget {
+class HomeService extends ConsumerStatefulWidget {
   const HomeService({super.key});
 
+  @override
+  ConsumerState<HomeService> createState() => _HomeServiceState();
+}
+
+class _HomeServiceState extends ConsumerState<HomeService> {
   final List<Map<String, String>> categories = const [
     {
       'label': 'ELECTRICIAN',
@@ -1122,279 +1132,437 @@ class HomeService extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Categories Grid
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            return Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: Image.network(
-                    categories[index]['url']!,
-                    width: 80.w,
-                    height: 80.h,
-                    fit: BoxFit.cover,
-                  ),
+    final homeServiceProvider = ref.watch(homeServiceCategoryController);
+    return homeServiceProvider.when(
+      data: (service) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Categories Grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              //itemCount: categories.length,
+              itemCount: service.data!.list!.length,
+              itemBuilder: (context, index) {
+                final item = service.data!.list![index];
+                return Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        // categories[index]['url']!,
+                        item.image ??
+                            "https://s3-media0.fl.yelpcdn.com/bphoto/y2N9GweV0RhaXx9dYbXHTA/l.jpg",
+                        width: 80.w,
+                        height: 80.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      //  categories[index]['label']!,
+                      item.name ?? "N/A",
+                      style: GoogleFonts.inter(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+
+            // We Provide Quality Services
+            Center(
+              child: Text(
+                'What We Offer',
+                style: GoogleFonts.inter(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  categories[index]['label']!,
-                  style: GoogleFonts.inter(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+            ),
+            Center(
+              child: Text(
+                'We Provide Quality Services',
+                style: GoogleFonts.inter(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+
+            // Services Grid
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 0.85,
+              children: const [
+                ServiceCard(
+                  title: 'Toilet Repair',
+                  desc:
+                      'Fast, reliable toilet fixes that restore proper function.',
+                  imageUrl:
+                      'https://media.gettyimages.com/id/2192255408/vector/plumbing-line-icon-set-group-of-object-pipe-bathtub-boiler-faucet-repair.jpg?s=612x612&w=gi&k=20&c=IgKlfAmPPCWSHJy7L_KlG4bjVyB_If33cqFTI8X51Ng=',
+                ),
+                ServiceCard(
+                  title: 'Faucet Installation',
+                  desc: 'Expert faucet fitting that ensures smooth water flow.',
+                  imageUrl:
+                      'https://media.istockphoto.com/id/1140334314/vector/plumber-master-with-wrench-fixing-kitchen-faucet.jpg?s=612x612&w=0&k=20&c=5XTiydIT32QfXU-x8WVM6rSeWpy6TopGU66RNfPunw4=',
+                ),
+                ServiceCard(
+                  title: 'Sewer Inspection',
+                  desc: 'Advanced sewer checks to detect issues early.',
+                  imageUrl:
+                      'https://media.istockphoto.com/id/2194903933/vector/plumbers-and-plumbing-thin-line-icons-editable-stroke-icons-include-plumbing-pipes-leaky.jpg?s=612x612&w=0&k=20&c=V2EAWro2g_Xk72Bl9c0LJ78ylpTxzZaZcyct56nqwCc=',
+                ),
+                ServiceCard(
+                  title: 'Drain Cleaning',
+                  desc: 'Prevent damage with professional drain cleaning.',
+                  imageUrl:
+                      'https://media.istockphoto.com/id/1363041172/vector/water-tank-pipe-pipeline-and-sewerage-cleaning-service-by-cleaner.jpg?s=612x612&w=0&k=20&c=OPh5837hpAV13c5fsr3daJrrzFK1E4HjSEhiDdgZwN0=',
                 ),
               ],
-            );
-          },
-        ),
+            ),
 
-        // We Provide Quality Services
-        Center(
-          child: Text(
-            'What We Offer',
-            style: GoogleFonts.inter(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Center(
-          child: Text(
-            'We Provide Quality Services',
-            style: GoogleFonts.inter(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        SizedBox(height: 16.h),
-
-        // Services Grid
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.85,
-          children: const [
-            ServiceCard(
-              title: 'Toilet Repair',
-              desc: 'Fast, reliable toilet fixes that restore proper function.',
-              imageUrl:
-                  'https://media.gettyimages.com/id/2192255408/vector/plumbing-line-icon-set-group-of-object-pipe-bathtub-boiler-faucet-repair.jpg?s=612x612&w=gi&k=20&c=IgKlfAmPPCWSHJy7L_KlG4bjVyB_If33cqFTI8X51Ng=',
-            ),
-            ServiceCard(
-              title: 'Faucet Installation',
-              desc: 'Expert faucet fitting that ensures smooth water flow.',
-              imageUrl:
-                  'https://media.istockphoto.com/id/1140334314/vector/plumber-master-with-wrench-fixing-kitchen-faucet.jpg?s=612x612&w=0&k=20&c=5XTiydIT32QfXU-x8WVM6rSeWpy6TopGU66RNfPunw4=',
-            ),
-            ServiceCard(
-              title: 'Sewer Inspection',
-              desc: 'Advanced sewer checks to detect issues early.',
-              imageUrl:
-                  'https://media.istockphoto.com/id/2194903933/vector/plumbers-and-plumbing-thin-line-icons-editable-stroke-icons-include-plumbing-pipes-leaky.jpg?s=612x612&w=0&k=20&c=V2EAWro2g_Xk72Bl9c0LJ78ylpTxzZaZcyct56nqwCc=',
-            ),
-            ServiceCard(
-              title: 'Drain Cleaning',
-              desc: 'Prevent damage with professional drain cleaning.',
-              imageUrl:
-                  'https://media.istockphoto.com/id/1363041172/vector/water-tank-pipe-pipeline-and-sewerage-cleaning-service-by-cleaner.jpg?s=612x612&w=0&k=20&c=OPh5837hpAV13c5fsr3daJrrzFK1E4HjSEhiDdgZwN0=',
-            ),
-          ],
-        ),
-
-        // Why We Are / Easy Solutions
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                'Who We Are',
-                style: GoogleFonts.inter(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'Easy Solutions For Plumbing and Home Repair Needs',
-                style: GoogleFonts.inter(fontSize: 16.sp),
-              ),
-              SizedBox(height: 10.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // Why We Are / Easy Solutions
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Chip(
-                    padding: EdgeInsets.zero,
-                    label: Text(
-                      'Tech Expertise',
-                      style: GoogleFonts.inter(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF000000),
+                  Text(
+                    'Who We Are',
+                    style: GoogleFonts.inter(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Easy Solutions For Plumbing and Home Repair Needs',
+                    style: GoogleFonts.inter(fontSize: 16.sp),
+                  ),
+                  SizedBox(height: 10.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Chip(
+                        padding: EdgeInsets.zero,
+                        label: Text(
+                          'Tech Expertise',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF000000),
+                          ),
+                        ),
+                      ),
+                      Chip(
+                        padding: EdgeInsets.zero,
+                        label: Text(
+                          'Advanced Tools',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF000000),
+                          ),
+                        ),
+                      ),
+                      Chip(
+                        padding: EdgeInsets.zero,
+                        label: Text(
+                          'Smart Solutions',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF000000),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
+                    child: const Text('Hire Experts'),
+                  ),
+                ],
+              ),
+            ),
+
+            // Plumber Image
+            Image.network(
+              'https://as1.ftcdn.net/jpg/05/94/89/64/1000_F_594896473_PmXb07nS8Odld7O3op4E5Vi2USzODYYc.jpg',
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+
+            // Affordable Pricing
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: const [
+                  Icon(Icons.price_check, size: 40, color: Colors.orange),
+                  Text(
+                    'Affordable Pricing',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Quality service doesn\'t have to be costly. We offer transparent, fair pricing on every job.',
+                  ),
+                ],
+              ),
+            ),
+
+            // Featured Projects
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Featured Projects',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      'See Full Gallery >',
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 200,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  FeaturedProject(
+                    imageUrl:
+                        'https://images.finehomebuilding.com/app/uploads/2016/04/09114955/021181bs116-01_xlg.jpg',
+                    title: 'Drain Overhaul',
+                    subtitle: 'Complete drain system upgrade',
+                  ),
+                  FeaturedProject(
+                    imageUrl:
+                        'https://www.thespruce.com/thmb/e-MxaOBy4AKp4JW1XFZGbrkDaIw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/how-to-install-a-sink-drain-2718789_hero_5078-64538f6f90d545c7af0728e4bf8f894e.jpg',
+                    title: 'Sink Installation',
+                    subtitle: 'New kitchen sink setup',
+                  ),
+                  FeaturedProject(
+                    imageUrl:
+                        'https://gharpedia.com/_next/image/?url=https%3A%2F%2Fcloudfrontgharpediabucket.gharpedia.com%2Fuploads%2F2021%2F12%2FBest-Way-to-Install-a-Bathroom-Sink-Drain-01-0504130013.jpg&w=3840&q=75',
+                    title: 'Drain Overhaul',
+                    subtitle: 'Complete drain system upgrade',
+                  ),
+                ],
+              ),
+            ),
+
+            // Latest Insights
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Our Latest Insights',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Image.network(
+                    'https://wg.scene7.com/is/image/wrenchgroup/insulate-pipes-info-ps22wi001wg?&wid=362',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'How to Protect Your Pipes During Cold Weather',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Read More >',
+                          style: TextStyle(color: Colors.orange),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        );
+      },
+      error: (error, stackTrace) {
+        log(stackTrace.toString());
+        return Center(child: Text(error.toString()));
+      },
+      loading: () {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: 6, // shimmer items
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.80,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemBuilder: (context, index) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// Image placeholder
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 80.w,
+                        height: 80.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 8.h),
+
+                    /// Text placeholder
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 75.w,
+                        height: 12.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            SizedBox(height: 20.h),
+            Center(
+              child: Column(
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(
+                      width: 100.w,
+                      height: 12.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(6.r),
                       ),
                     ),
                   ),
-                  Chip(
-                    padding: EdgeInsets.zero,
-                    label: Text(
-                      'Advanced Tools',
-                      style: GoogleFonts.inter(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF000000),
-                      ),
-                    ),
-                  ),
-                  Chip(
-                    padding: EdgeInsets.zero,
-                    label: Text(
-                      'Smart Solutions',
-                      style: GoogleFonts.inter(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF000000),
+
+                  SizedBox(height: 10.h),
+
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(
+                      width: 200.w,
+                      height: 12.h,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(6.r),
                       ),
                     ),
                   ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                child: const Text('Hire Experts'),
+            ),
+            SizedBox(height: 15.h),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: 4, // shimmer items
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.80,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
               ),
-            ],
-          ),
-        ),
-
-        // Plumber Image
-        Image.network(
-          'https://as1.ftcdn.net/jpg/05/94/89/64/1000_F_594896473_PmXb07nS8Odld7O3op4E5Vi2USzODYYc.jpg',
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
-
-        // Affordable Pricing
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: const [
-              Icon(Icons.price_check, size: 40, color: Colors.orange),
-              Text(
-                'Affordable Pricing',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Quality service doesn\'t have to be costly. We offer transparent, fair pricing on every job.',
-              ),
-            ],
-          ),
-        ),
-
-        // Featured Projects
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Featured Projects',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'See Full Gallery >',
-                  style: TextStyle(color: Colors.orange),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(
-          height: 200,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              FeaturedProject(
-                imageUrl:
-                    'https://images.finehomebuilding.com/app/uploads/2016/04/09114955/021181bs116-01_xlg.jpg',
-                title: 'Drain Overhaul',
-                subtitle: 'Complete drain system upgrade',
-              ),
-              FeaturedProject(
-                imageUrl:
-                    'https://www.thespruce.com/thmb/e-MxaOBy4AKp4JW1XFZGbrkDaIw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/how-to-install-a-sink-drain-2718789_hero_5078-64538f6f90d545c7af0728e4bf8f894e.jpg',
-                title: 'Sink Installation',
-                subtitle: 'New kitchen sink setup',
-              ),
-              FeaturedProject(
-                imageUrl:
-                    'https://gharpedia.com/_next/image/?url=https%3A%2F%2Fcloudfrontgharpediabucket.gharpedia.com%2Fuploads%2F2021%2F12%2FBest-Way-to-Install-a-Bathroom-Sink-Drain-01-0504130013.jpg&w=3840&q=75',
-                title: 'Drain Overhaul',
-                subtitle: 'Complete drain system upgrade',
-              ),
-            ],
-          ),
-        ),
-
-        // Latest Insights
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'Our Latest Insights',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Image.network(
-                'https://wg.scene7.com/is/image/wrenchgroup/insulate-pipes-info-ps22wi001wg?&wid=362',
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
+              itemBuilder: (context, index) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'How to Protect Your Pipes During Cold Weather',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  children: [
+                    /// Image placeholder
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 200.w,
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
                     ),
-                    Text('Read More >', style: TextStyle(color: Colors.orange)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
 
-        const SizedBox(height: 20),
-      ],
+                    SizedBox(height: 8.h),
+
+                    /// Text placeholder
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        width: 75.w,
+                        height: 12.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

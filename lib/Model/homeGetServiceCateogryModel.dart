@@ -1,27 +1,27 @@
 // To parse this JSON data, do
 //
-//     final editProfileResModel = editProfileResModelFromJson(jsonString);
+//     final homeGetServiceCategoryModel = homeGetServiceCategoryModelFromJson(jsonString);
 
 import 'dart:convert';
 
-EditProfileResModel editProfileResModelFromJson(String str) => EditProfileResModel.fromJson(json.decode(str));
+HomeGetServiceCategoryModel homeGetServiceCategoryModelFromJson(String str) => HomeGetServiceCategoryModel.fromJson(json.decode(str));
 
-String editProfileResModelToJson(EditProfileResModel data) => json.encode(data.toJson());
+String homeGetServiceCategoryModelToJson(HomeGetServiceCategoryModel data) => json.encode(data.toJson());
 
-class EditProfileResModel {
+class HomeGetServiceCategoryModel {
     String? message;
     int? code;
     bool? error;
     Data? data;
 
-    EditProfileResModel({
+    HomeGetServiceCategoryModel({
         this.message,
         this.code,
         this.error,
         this.data,
     });
 
-    factory EditProfileResModel.fromJson(Map<String, dynamic> json) => EditProfileResModel(
+    factory HomeGetServiceCategoryModel.fromJson(Map<String, dynamic> json) => HomeGetServiceCategoryModel(
         message: json["message"],
         code: json["code"],
         error: json["error"],
@@ -37,11 +37,29 @@ class EditProfileResModel {
 }
 
 class Data {
+    List<ListElement>? list;
+    int? total;
+
+    Data({
+        this.list,
+        this.total,
+    });
+
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
+        list: json["list"] == null ? [] : List<ListElement>.from(json["list"]!.map((x) => ListElement.fromJson(x))),
+        total: json["total"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "list": list == null ? [] : List<dynamic>.from(list!.map((x) => x.toJson())),
+        "total": total,
+    };
+}
+
+class ListElement {
     String? id;
     String? name;
-    String? password;
-    String? phone;
-    String? email;
+    String? image;
     bool? isDisable;
     bool? isDeleted;
     int? date;
@@ -49,14 +67,11 @@ class Data {
     int? year;
     int? createdAt;
     int? updatedAt;
-    String? image;
 
-    Data({
+    ListElement({
         this.id,
         this.name,
-        this.password,
-        this.phone,
-        this.email,
+        this.image,
         this.isDisable,
         this.isDeleted,
         this.date,
@@ -64,15 +79,12 @@ class Data {
         this.year,
         this.createdAt,
         this.updatedAt,
-        this.image,
     });
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory ListElement.fromJson(Map<String, dynamic> json) => ListElement(
         id: json["_id"],
         name: json["name"],
-        password: json["password"],
-        phone: json["phone"],
-        email: json["email"],
+        image: json["image"],
         isDisable: json["isDisable"],
         isDeleted: json["isDeleted"],
         date: json["date"],
@@ -80,15 +92,12 @@ class Data {
         year: json["year"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
-        image: json["image"],
     );
 
     Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
-        "password": password,
-        "phone": phone,
-        "email": email,
+        "image": image,
         "isDisable": isDisable,
         "isDeleted": isDeleted,
         "date": date,
@@ -96,9 +105,5 @@ class Data {
         "year": year,
         "createdAt": createdAt,
         "updatedAt": updatedAt,
-        "image": image,
     };
 }
-
-
-

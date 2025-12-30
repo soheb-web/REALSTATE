@@ -40,9 +40,10 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
         await box.put("email", response.data!.user!.email.toString());
         await box.put("phone", response.data!.user!.phone.toString());
         Fluttertoast.showToast(msg: response.message ?? "");
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => RealEstateHomePage()),
+          (route) => false,
         );
       } else {
         Fluttertoast.showToast(msg: response.message ?? "Error");

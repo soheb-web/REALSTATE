@@ -53,16 +53,6 @@ Authorization: {{token}}
     "image":"https://demmyimage.com/upload/khan.png"
 }
 
-############
-# userSellProperty
-post {{url}}/user/userSellProperty
-Content-type: application/json
-Authorization: {{token}}
-
-{
-    "name":"Sahil Joya",
-    "image":"https://demmyimage.com/upload/khan.png"
-}
 
 //userSellProperty
 ###

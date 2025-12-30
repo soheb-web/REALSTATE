@@ -49,9 +49,10 @@ class _LoginPageState extends State<LoginPage> {
         await box.put("name", response.data!.user!.name.toString());
         await box.put("email", response.data!.user!.email.toString());
         await box.put("phone", response.data!.user!.phone.toString());
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => RealEstateHomePage()),
+          (route) => false,
         );
         Fluttertoast.showToast(msg: response.message ?? "");
       } else {

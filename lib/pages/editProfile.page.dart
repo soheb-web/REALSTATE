@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realstate/Controller/userProfileController.dart';
 import 'package:realstate/Model/editProfileBodyModel.dart';
+import 'package:realstate/Model/uploadImageBodyModel.dart';
 import 'package:realstate/core/network/api.state.dart';
 import 'package:realstate/core/utils/preety.dio.dart';
 import 'package:realstate/pages/OTPVerify.page.dart';
@@ -25,6 +26,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final phoneController = TextEditingController();
   bool isLoading = false;
   File? profileImage;
+  String existingImage = "";
 
   final ImagePicker _picker = ImagePicker();
 
@@ -88,6 +90,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       nameController.text = userdata.data!.name ?? "";
       emailControler.text = userdata.data!.email ?? "";
       phoneController.text = userdata.data!.phone ?? "";
+      existingImage = userdata.data!.image ?? "";
     });
   }
 
@@ -95,13 +98,29 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     setState(() {
       isLoading = true;
     });
-    final body = EditProfileBodyModel(
-      name: nameController.text,
-      email: emailControler.text,
-      image: profileImage!.path.toString(),
-    );
+
     try {
       final service = APIStateNetwork(createDio());
+      String uploadImagePath = existingImage;
+
+      if (profileImage != null) {
+        final uploadResponse = await service.uploadImage(
+          File(profileImage!.path),
+        );
+
+        log("UPLOAD RESPONSE: ${uploadResponse.data}");
+        if (uploadResponse.error == false) {
+          uploadImagePath = uploadResponse.data!.imageUrl ?? "";
+        } else {
+          log("Image upload failed");
+        }
+      }
+
+      final body = EditProfileBodyModel(
+        name: nameController.text,
+        image: uploadImagePath,
+      );
+
       final response = await service.editProfile(body);
       if (response.code == 0 || response.error == false) {
         Navigator.pop(context);
@@ -146,9 +165,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         CircleAvatar(
                           radius: 60.r,
                           backgroundColor: Colors.grey.shade300,
+                          // backgroundImage: existingImage.isEmpty
+                          //     ? NetworkImage("https://i.pravatar.cc/150")
+                          //     : NetworkImage(existingImage),
                           backgroundImage: profileImage != null
                               ? FileImage(profileImage!)
-                              : const NetworkImage("https://i.pravatar.cc/150")
+                              : (existingImage.isNotEmpty
+                                        ? NetworkImage(existingImage)
+                                        : const NetworkImage(
+                                            "https://i.pravatar.cc/150",
+                                          ))
                                     as ImageProvider,
                         ),
                         Positioned(
@@ -184,7 +210,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     filled: true,
                     fillColor: Colors.white,
                     labelText: "Name",
-                    labelStyle: TextStyle(color: Colors.grey),
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     suffixIcon: Icon(Icons.edit, color: Colors.grey),
                     hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
                     enabledBorder: OutlineInputBorder(
@@ -208,14 +234,17 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 ),
                 SizedBox(height: 15.h),
                 TextField(
+                  onTap: () {
+                    Fluttertoast.showToast(
+                      msg: "Registered email cannot be updated",
+                    );
+                  },
                   controller: emailControler,
-                  readOnly: true,
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.white,
                     labelText: "Email",
-                    labelStyle: TextStyle(color: Colors.grey),
-                    suffixIcon: Icon(Icons.edit, color: Colors.grey),
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14.r),
@@ -249,8 +278,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     filled: true,
                     fillColor: Colors.white,
                     labelText: "Mobile Number",
-                    labelStyle: TextStyle(color: Colors.grey),
-                    suffixIcon: Icon(Icons.edit, color: Colors.grey),
+                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                     hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14.r),
@@ -276,7 +304,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     ),
                     child: Center(
                       child: Text(
-                        "Sign Up",
+                        "Update",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 17.sp,

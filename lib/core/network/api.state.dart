@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:realstate/Model/Body/userResister.dart';
 import 'package:realstate/Model/editProfileBodyModel.dart';
 import 'package:realstate/Model/editProfileResModel.dart';
+import 'package:realstate/Model/homeGetServiceCateogryModel.dart';
 import 'package:realstate/Model/loginWithPhoneBodyModel.dart';
 import 'package:realstate/Model/registerResModel.dart';
+import 'package:realstate/Model/uploadImageBodyModel.dart';
+import 'package:realstate/Model/uploadImageResModel.dart';
 import 'package:realstate/Model/userProfileResModel.dart';
 import 'package:realstate/Model/verifyBodyModel.dart';
 import 'package:realstate/Model/verifyResModel.dart';
@@ -28,6 +33,13 @@ abstract class APIStateNetwork {
   @POST("/user/userProfile")
   Future<UserProfileResModel> userProfile();
 
+  @MultiPart()
+  @POST("/uploadImage")
+  Future<UploadImageResModel> uploadImage(@Part(name: "file") File file);
+
   @POST("/user/userUpdate")
   Future<EditProfileResModel> editProfile(@Body() EditProfileBodyModel body);
+
+  @POST("/user/getServiceCategory")
+  Future<HomeGetServiceCategoryModel> homeServiceCategory();
 }

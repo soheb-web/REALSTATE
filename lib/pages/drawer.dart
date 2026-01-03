@@ -14,7 +14,7 @@ import 'package:shimmer/shimmer.dart';
 
 class AppDrawer extends ConsumerStatefulWidget {
   final AsyncValue<UserProfileResModel> profileController;
-  const AppDrawer({super.key,required this.profileController});
+  const AppDrawer({super.key, required this.profileController});
 
   @override
   ConsumerState<AppDrawer> createState() => _AppDrawerState();
@@ -101,7 +101,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                                 width: 35.w,
                                 height: 35.h,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.r),
+                                  shape: BoxShape.circle,
                                   color: Colors.blueGrey,
                                 ),
                                 child: Center(
@@ -172,7 +172,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
                   // bottomIndex = 3;
                 },
               ),
-              const Divider(),
+
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),

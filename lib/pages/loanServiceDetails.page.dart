@@ -21,12 +21,23 @@ class LoanServiceDetailsPage extends StatefulWidget {
 }
 
 class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
-  final loanAmmountController = TextEditingController();
-  final mobileController = TextEditingController();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
   final cityController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool? isBuying;
   bool isLoading = false;
+  String? selectLoanType;
+  List loanList = [
+    "Home Loan",
+    "Personal Loan",
+    "Business Loan",
+    "Vehicle Loan",
+    "Education Loan",
+    "Gold Loan",
+    "Loan Against Property",
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,38 +204,38 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                           ),
                           SizedBox(height: 10.h),
                           Text(
-                            "Enter Loan Amount",
+                            "Name",
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w400,
                               color: Colors.black,
                             ),
                           ),
+
                           SizedBox(height: 8.h),
                           TextFormField(
-                            controller: loanAmmountController,
-                            keyboardType: TextInputType.number,
+                            controller: nameController,
+                            keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 10.h,
                                 horizontal: 10.w,
                               ),
-                              labelText: "₹60000000",
+                              hintText: "Enter Name",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.r),
                               ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return "Enter Valid Ammount (Number only)";
+                                return "Name is required";
                               }
                               return null;
                             },
                           ),
-
                           SizedBox(height: 10.h),
                           Text(
-                            "+91 Mobile Number",
+                            "Mobile Number",
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w400,
@@ -234,7 +245,7 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                           SizedBox(height: 8.h),
                           TextFormField(
                             maxLength: 10,
-                            controller: mobileController,
+                            controller: phoneController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               counterText: "",
@@ -242,7 +253,7 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                 vertical: 10.h,
                                 horizontal: 10.w,
                               ),
-                              labelText: "Enter Mobile Number",
+                              hintText: "Enter Mobile Number",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.r),
                               ),
@@ -256,7 +267,77 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                           ),
                           SizedBox(height: 10.h),
                           Text(
-                            "Which city are you buying in?",
+                            "Loan Type",
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          FormField<String>(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Loan Type is required";
+                              }
+                              return null;
+                            },
+                            builder: (FormFieldState<String> field) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DropdownButtonFormField(
+                                    value: selectLoanType,
+                                    items: loanList.map((e) {
+                                      return DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectLoanType = value.toString();
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10.h,
+                                        horizontal: 10.w,
+                                      ),
+                                      hintText: "LoanType",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          30.r,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (field.hasError)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 10.w,
+                                        top: 5.h,
+                                      ),
+                                      child: Text(
+                                        field.errorText!,
+                                        style: TextStyle(
+                                          color: const Color.fromARGB(
+                                            255,
+                                            145,
+                                            36,
+                                            36,
+                                          ),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                          SizedBox(height: 10.h),
+                          Text(
+                            "City",
                             style: TextStyle(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w400,
@@ -272,7 +353,7 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                 vertical: 10.h,
                                 horizontal: 10.w,
                               ),
-                              labelText: "Enter City",
+                              hintText: "Enter City",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.r),
                               ),
@@ -282,80 +363,6 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                 return "City is required";
                               }
                               return null;
-                            },
-                          ),
-                          SizedBox(height: 10.h),
-                          FormField<bool>(
-                            validator: (value) {
-                              if (isBuying == null) {
-                                return "Please select Yes or No";
-                              }
-                              return null;
-                            },
-                            builder: (FormFieldState<bool> state) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Have you finalized your property?",
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-
-                                  Row(
-                                    children: [
-                                      Radio<bool>(
-                                        value: true,
-                                        groupValue: isBuying,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isBuying = value;
-                                            state.didChange(
-                                              value,
-                                            ); // 🔥 important
-                                          });
-                                        },
-                                      ),
-                                      const Text("Yes"),
-
-                                      SizedBox(width: 20.w),
-
-                                      Radio<bool>(
-                                        value: false,
-                                        groupValue: isBuying,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            isBuying = value;
-                                            state.didChange(
-                                              value,
-                                            ); // 🔥 important
-                                          });
-                                        },
-                                      ),
-                                      const Text("No"),
-                                    ],
-                                  ),
-
-                                  /// 🔴 Error message
-                                  if (state.hasError)
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: 12.w,
-                                        top: 4.h,
-                                      ),
-                                      child: Text(
-                                        state.errorText!,
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 12.sp,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              );
                             },
                           ),
 
@@ -370,59 +377,6 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                   borderRadius: BorderRadius.circular(30.r),
                                 ),
                               ),
-
-                              // onPressed: isLoading
-                              //     ? null
-                              //     : () async {
-                              //         if (!_formKey.currentState!.validate()) {
-                              //           return;
-                              //         }
-
-                              //         setState(() {
-                              //           isLoading = true;
-                              //         });
-
-                              //         try {
-                              //           final body = LoanQueryBodyModel(
-                              //             phone: mobileController.text,
-                              //             finalize: isBuying!,
-                              //             amount: loanAmmountController.text,
-                              //             city: cityController.text,
-                              //           );
-
-                              //           final service = APIStateNetwork(
-                              //             createDio(),
-                              //           );
-                              //           final response = await service.loanQuery(
-                              //             body,
-                              //           );
-
-                              //           if (response.code == 0 ||
-                              //               response.error == false) {
-                              //             Fluttertoast.showToast(
-                              //               msg: response.message ?? "",
-                              //             );
-
-                              //             _formKey.currentState!.reset();
-                              //             loanAmmountController.clear();
-                              //             mobileController.clear();
-                              //             cityController.clear();
-                              //             setState(() {
-                              //               isBuying = null;
-                              //             });
-                              //           } else {
-                              //             Fluttertoast.showToast(
-                              //               msg: response.message ?? "Error",
-                              //             );
-                              //           }
-                              //         } catch (e) {
-                              //           log(e.toString());
-                              //         } finally {
-                              //           setState(() {
-                              //             isLoading = false;
-                              //           });
-                              //         }
-                              //       },
                               onPressed: isLoading
                                   ? null
                                   : () async {
@@ -435,22 +389,19 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                         );
                                         return;
                                       }
-
                                       setState(() => isLoading = true);
-
                                       try {
                                         final body = LoanQueryBodyModel(
-                                          phone: mobileController.text,
-                                          finalize: isBuying!,
-                                          amount: loanAmmountController.text,
+                                          phone: phoneController.text,
                                           city: cityController.text,
+                                          loanType: selectLoanType.toString(),
+                                          name: nameController.text,
                                         );
 
                                         /// 🔥 FutureProvider ko direct call
                                         final response = await ref.read(
                                           loanQueryProvider(body).future,
                                         );
-
                                         if (response.code == 0 ||
                                             response.error == false) {
                                           /// ✅ API message show
@@ -458,9 +409,9 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                             msg: response.message ?? "Success",
                                           );
                                           _formKey.currentState!.reset();
-                                          loanAmmountController.clear();
-                                          mobileController.clear();
+                                          phoneController.clear();
                                           cityController.clear();
+                                          selectLoanType = null;
                                           setState(() => isBuying = null);
                                         } else {
                                           Fluttertoast.showToast(
@@ -475,7 +426,6 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                         setState(() => isLoading = false);
                                       }
                                     },
-
                               child: isLoading
                                   ? Center(
                                       child: SizedBox(
@@ -764,7 +714,6 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                             child: Text("30 yrs"),
                           ),
                         ],
-                        onChanged: (v) {},
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                             vertical: 10.h,
@@ -776,6 +725,7 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                           ),
                           hintText: "₹ 60,00,000",
                         ),
+                        onChanged: (v) {},
                       ),
                     ),
 

@@ -10,28 +10,28 @@ String loanQueryBodyModelToJson(LoanQueryBodyModel data) => json.encode(data.toJ
 
 class LoanQueryBodyModel {
     String phone;
-    bool finalize;
-    String amount;
+    String loanType;
+    String name;
     String city;
 
     LoanQueryBodyModel({
         required this.phone,
-        required this.finalize,
-        required this.amount,
+        required this.loanType,
+        required this.name,
         required this.city,
     });
 
     factory LoanQueryBodyModel.fromJson(Map<String, dynamic> json) => LoanQueryBodyModel(
         phone: json["phone"],
-        finalize: json["finalize"],
-        amount: json["amount"],
+        loanType: json["loanType"],
+        name: json["name"],
         city: json["city"],
     );
 
     Map<String, dynamic> toJson() => {
         "phone": phone,
-        "finalize": finalize,
-        "amount": amount,
+        "loanType": loanType,
+        "name": name,
         "city": city,
     };
 }

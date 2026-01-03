@@ -105,7 +105,7 @@ class PropertyIntroPage extends StatelessWidget {
                       ),
                     );
                   },
-                  child:  Text(
+                  child: Text(
                     "Get Started",
                     style: TextStyle(
                       fontSize: 16.h,

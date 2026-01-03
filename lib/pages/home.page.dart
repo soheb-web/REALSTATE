@@ -5,12 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:marquee/marquee.dart';
+import 'package:realstate/Controller/contactUsController.dart';
+import 'package:realstate/Controller/getMyPropertyController.dart';
 import 'package:realstate/Controller/homeServiceCategoryController.dart';
 import 'package:realstate/Controller/loanServiceController.dart';
 import 'package:realstate/Controller/userProfileController.dart';
+import 'package:realstate/Model/contactUsBodyModel.dart';
+import 'package:realstate/Model/getMyPropertyResModel.dart';
+import 'package:realstate/core/network/api.state.dart';
+import 'package:realstate/core/utils/preety.dio.dart';
+import 'package:realstate/pages/homeServiceDetails.page.dart';
 import 'package:realstate/pages/loanServiceDetails.page.dart';
+import 'package:realstate/pages/myPropertyDetals.page.dart';
 import 'package:realstate/pages/propertyCat.page.dart';
 import 'package:shimmer/shimmer.dart';
 import 'createPropertyPage.dart';
@@ -157,6 +166,15 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
       ),
     ];
   }
+
+  final emailController = TextEditingController();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final subjectController = TextEditingController();
+  final messageController = TextEditingController();
+  final locationController = TextEditingController();
+  bool isLoading = false;
+  final _formKeyContactUs = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -453,6 +471,7 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
 
   // ==================== MY LISTINGS SCREEN ====================
   Widget MyListingsScreen() {
+    final getMyPropertyProvider = ref.watch(getMyPropertyController);
     return SafeArea(
       top: false,
       child: Column(
@@ -466,7 +485,7 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
               child: Row(
                 children: [
                   Text(
-                    "My Listings",
+                    "My Property Manage",
                     style: GoogleFonts.inter(
                       color: Colors.white,
                       fontSize: 20.sp,
@@ -478,77 +497,87 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
             ),
           ),
           Expanded(
-            child: properties.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.home_work_outlined,
-                          size: 100,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'No properties listed yet',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
+            child: getMyPropertyProvider.when(
+              data: (snap) {
+                if (snap.data!.list!.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.home_outlined,
+                            size: 80.sp,
+                            color: Colors.grey.shade400,
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Tap + to add your first property',
-                          style: TextStyle(color: Colors.grey.shade500),
-                        ),
-                      ],
+                          SizedBox(height: 16.h),
+                          Text(
+                            "No properties listed yet",
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            "Start by adding your first property to manage listings easily.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          SizedBox(height: 20.h),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) =>
+                                      const CreatePropertyScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            label: const Text(
+                              "Add Property",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFF5722),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 24.w,
+                                vertical: 12.h,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: properties.length,
-                    itemBuilder: (context, index) {
-                      return PropertyCard(property: properties[index]);
-                    },
-                  ),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: snap.data!.list!.length,
+                  itemBuilder: (context, index) {
+                    return PropertyCard(data: snap.data!.list![index]);
+                  },
+                );
+              },
+              error: (error, stackTrace) {
+                return Center(child: Text(error.toString()));
+              },
+              loading: () => Center(child: CircularProgressIndicator()),
+            ),
           ),
         ],
       ),
     );
   }
-  /*
-  Widget CallUsScreen() {
-    return SafeArea(
-      top: false,
-      child: Column(
-        children: [
-
-
-          Container(
-            height: 120.h,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            color: const Color(0xffFF6A2A),
-            child: Padding(
-              padding: EdgeInsets.only(top: 25.h),
-              child: Row(
-                children: [
-                  // Icon(Icons.menu, color: Colors.white, size: 24.sp),
-                  // SizedBox(width: 12.w),
-                  Text(
-                    "Call Us Page",
-                    style: GoogleFonts.inter(color: Colors.white, fontSize: 20.sp, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Center(
-            child: Text("Call Us Page", style: TextStyle(fontSize: 20.sp)),
-          ),
-        ],
-      ),
-    );
-  }*/
 
   Widget CallUsScreen() {
     return SafeArea(
@@ -588,6 +617,390 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
               padding: EdgeInsets.all(24.w),
               child: Column(
                 children: [
+                  Form(
+                    key: _formKeyContactUs,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Enter Your Email",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.mail_outline,
+                              color: Colors.grey,
+                            ),
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Email",
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Email is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Enter Your Name",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        TextFormField(
+                          controller: nameController,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.person, color: Colors.grey),
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Name",
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Name is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Mobile Number",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          maxLength: 10,
+                          controller: phoneController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.call_outlined,
+                              color: Colors.grey,
+                            ),
+                            counterText: "",
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Mobile Number",
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Mobile Number is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Subject",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        TextFormField(
+                          controller: subjectController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.subject_outlined,
+                              color: Colors.grey,
+                            ),
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Subject",
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Subject is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Message",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        TextFormField(
+                          controller: messageController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.messenger_outline,
+                              color: Colors.grey,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Message",
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Message is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          "Location",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E1A35),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        SizedBox(width: 10),
+                        TextFormField(
+                          controller: locationController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.red.shade300,
+                              ),
+                            ),
+                            hintStyle: TextStyle(fontSize: 14.sp),
+                            hintText: "Location",
+                            prefixIcon: Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Location is required";
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        /// ==== SIGN IN BUTTON ====
+                        Center(
+                          child: GestureDetector(
+                            onTap: isLoading
+                                ? null
+                                : () async {
+                                    if (!_formKeyContactUs.currentState!
+                                        .validate()) {
+                                      return;
+                                    }
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    final body = ContactUsBodyModel(
+                                      email: emailController.text,
+                                      name: nameController.text,
+                                      phone: phoneController.text,
+                                      subject: subjectController.text,
+                                      message: messageController.text,
+                                      location: locationController.text,
+                                    );
+                                    try {
+                                      final response = await ref.read(
+                                        contactUsController(body).future,
+                                      );
+                                      if (response.code == 0 ||
+                                          response.error == false) {
+                                        Fluttertoast.showToast(
+                                          msg: response.message,
+                                        );
+                                        emailController.clear();
+                                        nameController.clear();
+                                        phoneController.clear();
+                                        subjectController.clear();
+                                        messageController.clear();
+                                        locationController.clear();
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          msg: response.message,
+                                        );
+                                      }
+                                    } catch (e) {
+                                      log(e.toString());
+                                    } finally {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  },
+                            child: Container(
+                              height: 50,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Color(0xffE86A34),
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Center(
+                                child: isLoading
+                                    ? Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : Text(
+                                        "Submit",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 17.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+
                   // Big Phone Icon
                   Icon(
                     Icons.phone_in_talk,
@@ -761,41 +1174,42 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
               ),
             ),
           ),
-          Expanded(
-            child: properties.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.home_work_outlined,
-                          size: 100,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'No properties listed yet',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Tap + to add your first property',
-                          style: TextStyle(color: Colors.grey.shade500),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: properties.length,
-                    itemBuilder: (context, index) {
-                      return PropertyCard(property: properties[index]);
-                    },
-                  ),
-          ),
+          // Expanded(
+          //   child: properties.isEmpty
+          //       ? Center(
+          //           child: Column(
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Icon(
+          //                 Icons.home_work_outlined,
+          //                 size: 100,
+          //                 color: Colors.grey.shade400,
+          //               ),
+          //               const SizedBox(height: 20),
+          //               Text(
+          //                 'No properties listed yet',
+          //                 style: TextStyle(
+          //                   fontSize: 18,
+          //                   color: Colors.grey.shade600,
+          //                 ),
+          //               ),
+          //               const SizedBox(height: 10),
+          //               Text(
+          //                 'Tap + to add your first property',
+          //                 style: TextStyle(color: Colors.grey.shade500),
+          //               ),
+          //             ],
+          //           ),
+          //         )
+          //       : ListView.builder(
+          //           padding: const EdgeInsets.all(16),
+          //           itemCount: properties.length,
+          //           itemBuilder: (context, index) {
+          //             return PropertyCard(: properties[index]);
+          //           },
+          //         ),
+          // ),
+          Text("Save Property"),
         ],
       ),
     );
@@ -945,123 +1359,381 @@ class Property {
 
 // ==================== PROPERTY CARD ====================
 class PropertyCard extends StatelessWidget {
-  final Property property;
-
-  const PropertyCard({Key? key, required this.property}) : super(key: key);
+  final ListElement data;
+  const PropertyCard({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    property.propertyType,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF5722),
+    final primary = const Color(0xFFFF5722);
+    // return Container(
+    //   margin: EdgeInsets.only(bottom: 20.h),
+    //   decoration: BoxDecoration(
+    //     color: Colors.white,
+    //     borderRadius: BorderRadius.circular(18.r),
+    //     boxShadow: [
+    //       BoxShadow(
+    //         color: Colors.black.withOpacity(.08),
+    //         blurRadius: 12,
+    //         offset: const Offset(0, 6),
+    //       ),
+    //     ],
+    //   ),
+    //   child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [
+    //       // ================= IMAGE =================
+    //       Stack(
+    //         children: [
+    //           ClipRRect(
+    //             borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
+    //             child: Image.network(
+    //               (data.uploadedPhotos != null &&
+    //                       data.uploadedPhotos!.isNotEmpty)
+    //                   ? data.uploadedPhotos!.first
+    //                   : '',
+    //               height: 220.h,
+    //               width: double.infinity,
+    //               fit: BoxFit.cover,
+    //               errorBuilder: (_, __, ___) => Container(
+    //                 height: 220.h,
+    //                 color: Colors.grey.shade300,
+    //                 child: const Icon(Icons.image, size: 50),
+    //               ),
+    //             ),
+    //           ),
+    //           // status
+    //           Positioned(
+    //             top: 14,
+    //             left: 14,
+    //             child: Container(
+    //               padding: EdgeInsets.symmetric(
+    //                 horizontal: 12.w,
+    //                 vertical: 6.h,
+    //               ),
+    //               decoration: BoxDecoration(
+    //                 color: data.status == 'approved'
+    //                     ? Colors.green
+    //                     : Colors.orange,
+    //                 borderRadius: BorderRadius.circular(20.r),
+    //               ),
+    //               child: Text(
+    //                 data.status?.toUpperCase() ?? '',
+    //                 style: TextStyle(
+    //                   fontSize: 12.sp,
+    //                   color: Colors.white,
+    //                   fontWeight: FontWeight.w600,
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+    //           // price floating
+    //           Positioned(
+    //             bottom: 14,
+    //             right: 14,
+    //             child: Container(
+    //               padding: EdgeInsets.symmetric(
+    //                 horizontal: 14.w,
+    //                 vertical: 8.h,
+    //               ),
+    //               decoration: BoxDecoration(
+    //                 color: Colors.white,
+    //                 borderRadius: BorderRadius.circular(30.r),
+    //                 boxShadow: [
+    //                   BoxShadow(
+    //                     color: Colors.black.withOpacity(.15),
+    //                     blurRadius: 8,
+    //                   ),
+    //                 ],
+    //               ),
+    //               child: Text(
+    //                 "₹ ${data.price}",
+    //                 style: TextStyle(
+    //                   fontSize: 16.sp,
+    //                   fontWeight: FontWeight.bold,
+    //                   color: primary,
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //       Padding(
+    //         padding: EdgeInsets.all(16.w),
+    //         child: Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: [
+    //             // ================= TITLE =================
+    //             Text(
+    //               "${data.bedRoom} BHK ${data.propertyType}",
+    //               style: TextStyle(
+    //                 fontSize: 18.sp,
+    //                 fontWeight: FontWeight.bold,
+    //               ),
+    //             ),
+    //             SizedBox(height: 4.h),
+    //             Row(
+    //               children: [
+    //                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
+    //                 SizedBox(width: 4.w),
+    //                 Expanded(
+    //                   child: Text(
+    //                     "${data.localityArea}, ${data.city}",
+    //                     style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //             SizedBox(height: 14.h),
+    //             // ================= SPECS GRID =================
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //               children: [
+    //                 _spec(Icons.king_bed, "${data.bedRoom} Beds"),
+    //                 _spec(Icons.bathtub, "${data.bathrooms} Baths"),
+    //                 _spec(Icons.square_foot, "${data.area} sqft"),
+    //                 _spec(Icons.chair, data.furnishing ?? ''),
+    //               ],
+    //             ),
+    //             SizedBox(height: 16.h),
+    //             // ================= AMENITIES =================
+    //             if (data.amenities != null && data.amenities!.isNotEmpty) ...[
+    //               Text(
+    //                 "Amenities",
+    //                 style: TextStyle(
+    //                   fontSize: 16.sp,
+    //                   fontWeight: FontWeight.w600,
+    //                 ),
+    //               ),
+    //               SizedBox(height: 8.h),
+    //               Wrap(
+    //                 spacing: 8.w,
+    //                 runSpacing: 8.h,
+    //                 children: data.amenities!
+    //                     .take(5)
+    //                     .map(
+    //                       (e) => Container(
+    //                         padding: EdgeInsets.symmetric(
+    //                           horizontal: 10.w,
+    //                           vertical: 6.h,
+    //                         ),
+    //                         decoration: BoxDecoration(
+    //                           color: primary.withOpacity(.1),
+    //                           borderRadius: BorderRadius.circular(20.r),
+    //                         ),
+    //                         child: Text(
+    //                           e.toString(),
+    //                           style: TextStyle(fontSize: 12.sp, color: primary),
+    //                         ),
+    //                       ),
+    //                     )
+    //                     .toList(),
+    //               ),
+    //             ],
+    //             SizedBox(height: 16.h),
+    //             // ================= OWNER =================
+    //             Container(
+    //               padding: EdgeInsets.all(12.w),
+    //               decoration: BoxDecoration(
+    //                 color: Colors.grey.shade100,
+    //                 borderRadius: BorderRadius.circular(12.r),
+    //               ),
+    //               child: Row(
+    //                 children: [
+    //                   const CircleAvatar(radius: 18, child: Icon(Icons.person)),
+    //                   SizedBox(width: 10.w),
+    //                   Expanded(
+    //                     child: Column(
+    //                       crossAxisAlignment: CrossAxisAlignment.start,
+    //                       children: [
+    //                         Text(
+    //                           data.fullName ?? '',
+    //                           style: TextStyle(fontWeight: FontWeight.w600),
+    //                         ),
+    //                         Text(
+    //                           data.phone ?? '',
+    //                           style: TextStyle(
+    //                             fontSize: 12.sp,
+    //                             color: Colors.grey,
+    //                           ),
+    //                         ),
+    //                       ],
+    //                     ),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.08),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ================= IMAGE =================
+          Stack(
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) =>
+                          MyPropertyDetalsPage(propetyId: data.slug ?? ""),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.r),
+                  ),
+                  child: Image.network(
+                    (data.uploadedPhotos != null &&
+                            data.uploadedPhotos!.isNotEmpty)
+                        ? data.uploadedPhotos!.first
+                        : '',
+                    height: 190.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: double.infinity,
+                      height: 190.h,
+                      color: Colors.grey.shade300,
+                      child: Center(child: const Icon(Icons.image, size: 40)),
                     ),
                   ),
                 ),
-                Chip(
-                  label: Text(
-                    property.listingCategory,
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                  backgroundColor: const Color(0xFFFF5722),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.grey, size: 18),
-                const SizedBox(width: 4),
-                Text(
-                  '${property.locality}, ${property.city}',
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '₹ ${property.price}',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildSpecItem(Icons.king_bed, '${property.bedrooms} Beds'),
-                _buildSpecItem(Icons.bathtub, '${property.bathrooms} Baths'),
-                _buildSpecItem(Icons.square_foot, '${property.area} sqft'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: [
-                Chip(
-                  label: Text(
-                    property.furnishing,
-                    style: const TextStyle(fontSize: 12),
+
+              // BUY / RENT CHIP
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 5.h,
                   ),
-                  backgroundColor: Colors.grey.shade200,
-                ),
-                if (property.amenities.isNotEmpty)
-                  Chip(
-                    label: Text(
-                      '${property.amenities.length} Amenities',
-                      style: const TextStyle(fontSize: 12),
+                  decoration: BoxDecoration(
+                    color: primary,
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    (data.listingCategory ?? '').toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
-                    backgroundColor: Colors.grey.shade200,
                   ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
+                ),
+              ),
+
+              // PRICE
+              Positioned(
+                bottom: 12,
+                right: 12,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    "₹ ${data.price}",
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ================= DETAILS =================
+          Padding(
+            padding: EdgeInsets.all(14.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.person, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
+                // TITLE
                 Text(
-                  'Listed by: ${property.fullName}',
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  "${data.bedRoom} BHK ${data.propertyType}",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                SizedBox(height: 4.h),
+
+                // LOCATION
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        "${data.localityArea}, ${data.city}",
+                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 10.h),
+
+                // SPECS
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _spec(Icons.king_bed, "${data.bedRoom} Beds"),
+                    _spec(Icons.bathtub, "${data.bathrooms} Baths"),
+                    _spec(Icons.square_foot, "${data.area} sqft"),
+                    _spec(Icons.chair, data.furnishing ?? ''),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: 10.h),
+        ],
       ),
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String label) {
-    return Row(
+  // ================= HELPERS (SAME CLASS) =================
+  Widget _spec(IconData icon, String text) {
+    return Column(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFFFF5722)),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Icon(icon, size: 18, color: Colors.grey),
+        SizedBox(height: 4.h),
+        Text(text, style: TextStyle(fontSize: 12.sp)),
       ],
     );
   }
 }
 
 // ==================== MAIN STATE CLASS ====================
-
 class HomeService extends ConsumerStatefulWidget {
   const HomeService({super.key});
 
@@ -1162,15 +1834,25 @@ class _HomeServiceState extends ConsumerState<HomeService> {
                 final item = service.data!.list![index];
                 return Column(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        // categories[index]['url']!,
-                        item.image ??
-                            "https://s3-media0.fl.yelpcdn.com/bphoto/y2N9GweV0RhaXx9dYbXHTA/l.jpg",
-                        width: 80.w,
-                        height: 80.h,
-                        fit: BoxFit.cover,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => HomeServiceDetailsPage(),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.r),
+                        child: Image.network(
+                          // categories[index]['url']!,
+                          item.image ??
+                              "https://s3-media0.fl.yelpcdn.com/bphoto/y2N9GweV0RhaXx9dYbXHTA/l.jpg",
+                          width: 80.w,
+                          height: 80.h,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     SizedBox(height: 8.h),

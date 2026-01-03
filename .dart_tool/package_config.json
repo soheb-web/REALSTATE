@@ -674,6 +674,12 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "smooth_page_indicator",
+      "rootUri": "file:///C:/Users/Globally-04/AppData/Local/Pub/Cache/hosted/pub.dev/smooth_page_indicator-2.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "source_gen",
       "rootUri": "file:///C:/Users/Globally-04/AppData/Local/Pub/Cache/hosted/pub.dev/source_gen-4.1.1",
       "packageUri": "lib/",

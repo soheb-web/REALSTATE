@@ -57,6 +57,7 @@ dependencies:
   json_annotation: ^4.9.0
   logger: ^2.6.2
   shimmer: ^3.0.0
+  smooth_page_indicator: ^2.0.1
 
 
 

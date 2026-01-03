@@ -137,6 +137,7 @@ Dio createDio() {
       //   }
       //   handler.next(e);
       // },
+     
       onError: (error, handler) {
         if (error.response!.statusCode == 401) {
           Fluttertoast.showToast(
@@ -148,6 +149,7 @@ Dio createDio() {
             CupertinoPageRoute(builder: (_) => LoginPage()),
             (route) => false,
           );
+          
         } else {
           log("Global context is null, cannot show SnackBar or navigate");
         }

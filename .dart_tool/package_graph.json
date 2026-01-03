@@ -31,7 +31,8 @@
         "pretty_dio_logger",
         "retrofit",
         "riverpod",
-        "shimmer"
+        "shimmer",
+        "smooth_page_indicator"
       ],
       "devDependencies": [
         "build_runner",
@@ -127,6 +128,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "smooth_page_indicator",
+      "version": "2.0.1",
+      "dependencies": [
+        "flutter"
       ]
     },
     {

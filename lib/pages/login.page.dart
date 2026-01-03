@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
         Fluttertoast.showToast(msg: response.message ?? "Error");
       }
     } catch (e) {
-      log(e.toString());
+      log("Login Error : ${e.toString()}");
     } finally {
       setState(() {
         isLoading = false;

@@ -76,12 +76,11 @@ class ListElement {
     String? description;
     List<AroundProject>? aroundProject;
     AveneuOverView? aveneuOverView;
-    String? fullName;
-    String? email;
-    String? phone;
     String? propertyAddress;
     List<String>? uploadedPhotos;
     String? status;
+    bool? verifyed;
+    UploadBy? uploadBy;
     bool? isDisable;
     bool? isDeleted;
     int? date;
@@ -89,9 +88,8 @@ class ListElement {
     int? year;
     int? createdAt;
     int? updatedAt;
-    int? v;
     String? slug;
-    String? uploadBy;
+    int? v;
 
     ListElement({
         this.id,
@@ -113,12 +111,11 @@ class ListElement {
         this.description,
         this.aroundProject,
         this.aveneuOverView,
-        this.fullName,
-        this.email,
-        this.phone,
         this.propertyAddress,
         this.uploadedPhotos,
         this.status,
+        this.verifyed,
+        this.uploadBy,
         this.isDisable,
         this.isDeleted,
         this.date,
@@ -126,9 +123,8 @@ class ListElement {
         this.year,
         this.createdAt,
         this.updatedAt,
-        this.v,
         this.slug,
-        this.uploadBy,
+        this.v,
     });
 
     factory ListElement.fromJson(Map<String, dynamic> json) => ListElement(
@@ -151,12 +147,11 @@ class ListElement {
         description: json["description"],
         aroundProject: json["aroundProject"] == null ? [] : List<AroundProject>.from(json["aroundProject"]!.map((x) => AroundProject.fromJson(x))),
         aveneuOverView: json["aveneuOverView"] == null ? null : AveneuOverView.fromJson(json["aveneuOverView"]),
-        fullName: json["fullName"],
-        email: json["email"],
-        phone: json["phone"],
         propertyAddress: json["propertyAddress"],
         uploadedPhotos: json["uploadedPhotos"] == null ? [] : List<String>.from(json["uploadedPhotos"]!.map((x) => x)),
         status: json["status"],
+        verifyed: json["verifyed"],
+        uploadBy: json["uploadBy"] == null ? null : UploadBy.fromJson(json["uploadBy"]),
         isDisable: json["isDisable"],
         isDeleted: json["isDeleted"],
         date: json["date"],
@@ -164,9 +159,8 @@ class ListElement {
         year: json["year"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
-        v: json["__v"],
         slug: json["slug"],
-        uploadBy: json["uploadBy"],
+        v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -189,12 +183,11 @@ class ListElement {
         "description": description,
         "aroundProject": aroundProject == null ? [] : List<dynamic>.from(aroundProject!.map((x) => x.toJson())),
         "aveneuOverView": aveneuOverView?.toJson(),
-        "fullName": fullName,
-        "email": email,
-        "phone": phone,
         "propertyAddress": propertyAddress,
         "uploadedPhotos": uploadedPhotos == null ? [] : List<dynamic>.from(uploadedPhotos!.map((x) => x)),
         "status": status,
+        "verifyed": verifyed,
+        "uploadBy": uploadBy?.toJson(),
         "isDisable": isDisable,
         "isDeleted": isDeleted,
         "date": date,
@@ -202,56 +195,91 @@ class ListElement {
         "year": year,
         "createdAt": createdAt,
         "updatedAt": updatedAt,
-        "__v": v,
         "slug": slug,
-        "uploadBy": uploadBy,
+        "__v": v,
     };
 }
 
 class AroundProject {
+    String? id;
     String? name;
     String? details;
-    String? id;
 
     AroundProject({
+        this.id,
         this.name,
         this.details,
-        this.id,
     });
 
     factory AroundProject.fromJson(Map<String, dynamic> json) => AroundProject(
+        id: json["_id"],
         name: json["name"],
         details: json["details"],
-        id: json["_id"],
     );
 
     Map<String, dynamic> toJson() => {
+        "_id": id,
         "name": name,
         "details": details,
-        "_id": id,
     };
 }
 
 class AveneuOverView {
+    String? projectArea;
     String? size;
     String? projectSize;
-    String? avgPrice;
+    String? launchDate;
+    String? possessionStart;
 
     AveneuOverView({
+        this.projectArea,
         this.size,
         this.projectSize,
-        this.avgPrice,
+        this.launchDate,
+        this.possessionStart,
     });
 
     factory AveneuOverView.fromJson(Map<String, dynamic> json) => AveneuOverView(
+        projectArea: json["projectArea"],
         size: json["size"],
         projectSize: json["projectSize"],
-        avgPrice: json["avgPrice"],
+        launchDate: json["launchDate"],
+        possessionStart: json["possessionStart"],
     );
 
     Map<String, dynamic> toJson() => {
+        "projectArea": projectArea,
         "size": size,
         "projectSize": projectSize,
-        "avgPrice": avgPrice,
+        "launchDate": launchDate,
+        "possessionStart": possessionStart,
+    };
+}
+
+class UploadBy {
+    String? id;
+    String? name;
+    String? phone;
+    String? email;
+
+    UploadBy({
+        this.id,
+        this.name,
+        this.phone,
+        this.email,
+    });
+
+    factory UploadBy.fromJson(Map<String, dynamic> json) => UploadBy(
+        id: json["_id"],
+        name: json["name"],
+        phone: json["phone"],
+        email: json["email"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "_id": id,
+        "name": name,
+        "phone": phone,
+        "email": email,
     };
 }

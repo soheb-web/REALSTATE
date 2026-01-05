@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realstate/Model/Body/CreatePropertyBodyModel.dart';
 import 'package:flutter/cupertino.dart';
@@ -104,12 +105,13 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
   final TextEditingController _launchDateController = TextEditingController();
   final TextEditingController _avgPriceController = TextEditingController();
 
-  final TextEditingController _possessionDateController = TextEditingController();
+  final TextEditingController _possessionDateController =
+      TextEditingController();
   // final TextEditingController _fullNameController = TextEditingController();
   // final TextEditingController _emailController = TextEditingController();
   // final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _propertyAddressController = TextEditingController();
-
+  final TextEditingController _propertyAddressController =
+      TextEditingController();
 
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -459,15 +461,9 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-
-            const Text('BASIC INFO', style: TextStyle(color: Color(0xFFFF5722), fontSize: 16, fontWeight: FontWeight.bold)),
-
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
 
             // BASIC INFO के बाद...
-
-
             const Text(
               'BASIC INFO',
               style: TextStyle(
@@ -486,26 +482,24 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
               onChanged: (v) => setState(() => selectedPropertyType = v),
             ),
 
-             SizedBox(height: 16),
+            SizedBox(height: 16),
 
             _buildDropdown(
               label: 'Property Type',
               value: selectedPropertySubType, // नया variable add करना पड़ेगा
               items: selectedPropertyType == "residential"
                   ? [
-
-                "apartment",
-                "townhouse",
-                "villa-compound",
-                "land",
-                "building",
-                "villa",
-                "penthouse",
-                "hotel-apartment",
-                "floor",
-                "studio",]
-
-
+                      "apartment",
+                      "townhouse",
+                      "villa-compound",
+                      "land",
+                      "building",
+                      "villa",
+                      "penthouse",
+                      "hotel-apartment",
+                      "floor",
+                      "studio",
+                    ]
                   : [
                       "office",
                       "warehouse",
@@ -529,7 +523,7 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
             _buildDropdown(
               label: 'Listing Category',
               value: selectedListingCategory,
-              items: ['buy', 'rent','sell'],
+              items: ['rent', 'sell'],
               onChanged: (v) => setState(() => selectedListingCategory = v),
             ),
 
@@ -808,16 +802,14 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
                     ),
                   ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 25.h),
 
-            const Text('Contact Information', style: TextStyle(color: Color(0xFFFF5722), fontSize: 16, fontWeight: FontWeight.bold)),
             // const SizedBox(height: 16),
             // _buildTextField('Full Name', controller: _fullNameController),
             // const SizedBox(height: 16),
             // _buildTextField('Email', controller: _emailController),
             // const SizedBox(height: 16),
             // _buildTextField('Phone', controller: _phoneController),
-
             const Text(
               'Contact Information',
               style: TextStyle(
@@ -832,7 +824,6 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
             _buildTextField('Email', controller: _emailController),
             const SizedBox(height: 16),
             _buildTextField('Phone', controller: _phoneController),
-
 
             const SizedBox(height: 32),
             const Text(

@@ -12,7 +12,7 @@ part of 'api.state.dart';
 
 class _APIStateNetwork implements APIStateNetwork {
   _APIStateNetwork(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.1.22:9999/api/v1';
+    baseUrl ??= 'https://api.propertyleinnovation.com/api/v1';
   }
 
   final Dio _dio;
@@ -496,6 +496,36 @@ class _APIStateNetwork implements APIStateNetwork {
     late GetMyPropertyDetailsResModel _value;
     try {
       _value = GetMyPropertyDetailsResModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<SaveContactInPropertyResModel> saveContactInProperty(
+    SaveContactInPropertyBodyModel body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<SaveContactInPropertyResModel>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/saveContactInProperty',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SaveContactInPropertyResModel _value;
+    try {
+      _value = SaveContactInPropertyResModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

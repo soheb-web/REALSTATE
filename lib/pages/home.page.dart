@@ -1334,7 +1334,9 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PropertyPageCat(property:title)),
+          MaterialPageRoute(
+            builder: (context) => PropertyPageCat(property: title),
+          ),
         );
       },
       child: Container(
@@ -1358,8 +1360,6 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
     );
   }
 }
-
-
 
 // ==================== PROPERTY MODEL ====================
 class Property {
@@ -1410,209 +1410,7 @@ class PropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = const Color(0xFFFF5722);
-    // return Container(
-    //   margin: EdgeInsets.only(bottom: 20.h),
-    //   decoration: BoxDecoration(
-    //     color: Colors.white,
-    //     borderRadius: BorderRadius.circular(18.r),
-    //     boxShadow: [
-    //       BoxShadow(
-    //         color: Colors.black.withOpacity(.08),
-    //         blurRadius: 12,
-    //         offset: const Offset(0, 6),
-    //       ),
-    //     ],
-    //   ),
-    //   child: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       // ================= IMAGE =================
-    //       Stack(
-    //         children: [
-    //           ClipRRect(
-    //             borderRadius: BorderRadius.vertical(top: Radius.circular(18.r)),
-    //             child: Image.network(
-    //               (data.uploadedPhotos != null &&
-    //                       data.uploadedPhotos!.isNotEmpty)
-    //                   ? data.uploadedPhotos!.first
-    //                   : '',
-    //               height: 220.h,
-    //               width: double.infinity,
-    //               fit: BoxFit.cover,
-    //               errorBuilder: (_, __, ___) => Container(
-    //                 height: 220.h,
-    //                 color: Colors.grey.shade300,
-    //                 child: const Icon(Icons.image, size: 50),
-    //               ),
-    //             ),
-    //           ),
-    //           // status
-    //           Positioned(
-    //             top: 14,
-    //             left: 14,
-    //             child: Container(
-    //               padding: EdgeInsets.symmetric(
-    //                 horizontal: 12.w,
-    //                 vertical: 6.h,
-    //               ),
-    //               decoration: BoxDecoration(
-    //                 color: data.status == 'approved'
-    //                     ? Colors.green
-    //                     : Colors.orange,
-    //                 borderRadius: BorderRadius.circular(20.r),
-    //               ),
-    //               child: Text(
-    //                 data.status?.toUpperCase() ?? '',
-    //                 style: TextStyle(
-    //                   fontSize: 12.sp,
-    //                   color: Colors.white,
-    //                   fontWeight: FontWeight.w600,
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //           // price floating
-    //           Positioned(
-    //             bottom: 14,
-    //             right: 14,
-    //             child: Container(
-    //               padding: EdgeInsets.symmetric(
-    //                 horizontal: 14.w,
-    //                 vertical: 8.h,
-    //               ),
-    //               decoration: BoxDecoration(
-    //                 color: Colors.white,
-    //                 borderRadius: BorderRadius.circular(30.r),
-    //                 boxShadow: [
-    //                   BoxShadow(
-    //                     color: Colors.black.withOpacity(.15),
-    //                     blurRadius: 8,
-    //                   ),
-    //                 ],
-    //               ),
-    //               child: Text(
-    //                 "₹ ${data.price}",
-    //                 style: TextStyle(
-    //                   fontSize: 16.sp,
-    //                   fontWeight: FontWeight.bold,
-    //                   color: primary,
-    //                 ),
-    //               ),
-    //             ),
-    //           ),
-    //         ],
-    //       ),
-    //       Padding(
-    //         padding: EdgeInsets.all(16.w),
-    //         child: Column(
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             // ================= TITLE =================
-    //             Text(
-    //               "${data.bedRoom} BHK ${data.propertyType}",
-    //               style: TextStyle(
-    //                 fontSize: 18.sp,
-    //                 fontWeight: FontWeight.bold,
-    //               ),
-    //             ),
-    //             SizedBox(height: 4.h),
-    //             Row(
-    //               children: [
-    //                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
-    //                 SizedBox(width: 4.w),
-    //                 Expanded(
-    //                   child: Text(
-    //                     "${data.localityArea}, ${data.city}",
-    //                     style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //             SizedBox(height: 14.h),
-    //             // ================= SPECS GRID =================
-    //             Row(
-    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //               children: [
-    //                 _spec(Icons.king_bed, "${data.bedRoom} Beds"),
-    //                 _spec(Icons.bathtub, "${data.bathrooms} Baths"),
-    //                 _spec(Icons.square_foot, "${data.area} sqft"),
-    //                 _spec(Icons.chair, data.furnishing ?? ''),
-    //               ],
-    //             ),
-    //             SizedBox(height: 16.h),
-    //             // ================= AMENITIES =================
-    //             if (data.amenities != null && data.amenities!.isNotEmpty) ...[
-    //               Text(
-    //                 "Amenities",
-    //                 style: TextStyle(
-    //                   fontSize: 16.sp,
-    //                   fontWeight: FontWeight.w600,
-    //                 ),
-    //               ),
-    //               SizedBox(height: 8.h),
-    //               Wrap(
-    //                 spacing: 8.w,
-    //                 runSpacing: 8.h,
-    //                 children: data.amenities!
-    //                     .take(5)
-    //                     .map(
-    //                       (e) => Container(
-    //                         padding: EdgeInsets.symmetric(
-    //                           horizontal: 10.w,
-    //                           vertical: 6.h,
-    //                         ),
-    //                         decoration: BoxDecoration(
-    //                           color: primary.withOpacity(.1),
-    //                           borderRadius: BorderRadius.circular(20.r),
-    //                         ),
-    //                         child: Text(
-    //                           e.toString(),
-    //                           style: TextStyle(fontSize: 12.sp, color: primary),
-    //                         ),
-    //                       ),
-    //                     )
-    //                     .toList(),
-    //               ),
-    //             ],
-    //             SizedBox(height: 16.h),
-    //             // ================= OWNER =================
-    //             Container(
-    //               padding: EdgeInsets.all(12.w),
-    //               decoration: BoxDecoration(
-    //                 color: Colors.grey.shade100,
-    //                 borderRadius: BorderRadius.circular(12.r),
-    //               ),
-    //               child: Row(
-    //                 children: [
-    //                   const CircleAvatar(radius: 18, child: Icon(Icons.person)),
-    //                   SizedBox(width: 10.w),
-    //                   Expanded(
-    //                     child: Column(
-    //                       crossAxisAlignment: CrossAxisAlignment.start,
-    //                       children: [
-    //                         Text(
-    //                           data.fullName ?? '',
-    //                           style: TextStyle(fontWeight: FontWeight.w600),
-    //                         ),
-    //                         Text(
-    //                           data.phone ?? '',
-    //                           style: TextStyle(
-    //                             fontSize: 12.sp,
-    //                             color: Colors.grey,
-    //                           ),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                   ),
-    //                 ],
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
@@ -1654,6 +1452,16 @@ class PropertyCard extends StatelessWidget {
                     height: 190.h,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 190.h,
+                        width: double.infinity,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 1),
+                        ),
+                      );
+                    },
                     errorBuilder: (_, __, ___) => Container(
                       width: double.infinity,
                       height: 190.h,
@@ -1884,7 +1692,8 @@ class _HomeServiceState extends ConsumerState<HomeService> {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
-                            builder: (context) => HomeServiceDetailsPage(),
+                            builder: (context) =>
+                                HomeServiceDetailsPage(service: item),
                           ),
                         );
                       },

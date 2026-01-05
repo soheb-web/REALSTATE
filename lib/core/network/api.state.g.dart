@@ -12,7 +12,7 @@ part of 'api.state.dart';
 
 class _APIStateNetwork implements APIStateNetwork {
   _APIStateNetwork(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://192.168.1.22:9999/api/v1';
+    baseUrl ??= 'https://api.propertyleinnovation.com/api/v1';
   }
 
   final Dio _dio;

@@ -331,6 +331,7 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
       body: Column(
         children: [
           const SizedBox(height: 10),
+
           Row(
             children: [
               Expanded(
@@ -374,6 +375,7 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
           ).paddingAll(16),
 
           // API Response Handle
+
           Expanded(
             child: propertyAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),

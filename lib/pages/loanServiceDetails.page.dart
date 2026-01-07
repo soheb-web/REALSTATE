@@ -20,6 +20,13 @@ class LoanServiceDetailsPage extends StatefulWidget {
   State<LoanServiceDetailsPage> createState() => _LoanServiceDetailsPageState();
 }
 
+class LoanType {
+  final String label;
+  final String value;
+
+  LoanType({required this.label, required this.value});
+}
+
 class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
@@ -27,15 +34,17 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
   final _formKey = GlobalKey<FormState>();
   bool? isBuying;
   bool isLoading = false;
-  String? selectLoanType;
-  List loanList = [
-    "Home Loan",
-    "Personal Loan",
-    "Business Loan",
-    "Vehicle Loan",
-    "Education Loan",
-    "Gold Loan",
-    "Loan Against Property",
+
+  LoanType? selectLoanType;
+
+  List<LoanType> loanList = [
+    LoanType(label: "Home Loan", value: "home_loan"),
+    LoanType(label: "Personal Loan", value: "personal_loan"),
+    LoanType(label: "Business Loan", value: "business_loan"),
+    LoanType(label: "Vehicle Loan", value: "vehicle_loan"),
+    LoanType(label: "Education Loan", value: "education_loan"),
+    LoanType(label: "Gold Loan", value: "gold_loan"),
+    LoanType(label: "Loan Against Property", value: "loan_against_property"),
   ];
 
   @override
@@ -303,66 +312,37 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                 ),
                               ),
                               SizedBox(height: 8.h),
-                              FormField<String>(
+                              DropdownButtonFormField<LoanType>(
+                                value: selectLoanType,
+                                items: loanList.map<DropdownMenuItem<LoanType>>(
+                                  (e) {
+                                    return DropdownMenuItem<LoanType>(
+                                      value: e,
+                                      child: Text(e.label),
+                                    );
+                                  },
+                                ).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectLoanType = value;
+                                  });
+                                },
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
+                                  if (value == null || value.label.isEmpty) {
                                     return "Loan Type is required";
                                   }
                                   return null;
                                 },
-                                builder: (FormFieldState<String> field) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      DropdownButtonFormField(
-                                        value: selectLoanType,
-                                        items: loanList.map((e) {
-                                          return DropdownMenuItem(
-                                            value: e,
-                                            child: Text(e),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectLoanType = value.toString();
-                                          });
-                                        },
-                                        decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 10.h,
-                                            horizontal: 10.w,
-                                          ),
-                                          hintText: "LoanType",
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              30.r,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      if (field.hasError)
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: 10.w,
-                                            top: 5.h,
-                                          ),
-                                          child: Text(
-                                            field.errorText!,
-                                            style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                255,
-                                                145,
-                                                36,
-                                                36,
-                                              ),
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  );
-                                },
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 10.h,
+                                    horizontal: 10.w,
+                                  ),
+                                  hintText: "Select Loan Type",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.r),
+                                  ),
+                                ),
                               ),
                               SizedBox(height: 10.h),
                               Text(
@@ -413,19 +393,12 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                               .validate())
                                             return;
 
-                                          if (isBuying == null) {
-                                            Fluttertoast.showToast(
-                                              msg: "Please select Yes or No",
-                                            );
-                                            return;
-                                          }
                                           setState(() => isLoading = true);
                                           try {
                                             final body = LoanQueryBodyModel(
                                               phone: phoneController.text,
                                               city: cityController.text,
-                                              loanType: selectLoanType
-                                                  .toString(),
+                                              loanType: selectLoanType!.value,
                                               name: nameController.text,
                                             );
 
@@ -444,8 +417,10 @@ class _LoanServiceDetailsPageState extends State<LoanServiceDetailsPage> {
                                               _formKey.currentState!.reset();
                                               phoneController.clear();
                                               cityController.clear();
-                                              selectLoanType = null;
-                                              setState(() => isBuying = null);
+                                              nameController.clear();
+                                              setState(() {
+                                                selectLoanType = null;
+                                              });
                                             } else {
                                               Fluttertoast.showToast(
                                                 msg: response.message ?? "",

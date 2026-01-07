@@ -15,6 +15,8 @@ import 'package:realstate/Model/loanQueryResModel.dart';
 import 'package:realstate/Model/loanServiceResModel.dart';
 import 'package:realstate/Model/loginWithPhoneBodyModel.dart';
 import 'package:realstate/Model/registerResModel.dart';
+import 'package:realstate/Model/saveContactInPropertyBodyModel.dart';
+import 'package:realstate/Model/saveContactInPropertyResModel.dart';
 import 'package:realstate/Model/uploadImageBodyModel.dart';
 import 'package:realstate/Model/uploadImageResModel.dart';
 import 'package:realstate/Model/userProfileResModel.dart';
@@ -26,12 +28,17 @@ import '../../Model/Body/PropertyListBodyModel.dart';
 import '../../Model/CityResponseModel.dart';
 import '../../Model/CreatePropertyResponseModel.dart';
 import '../../Model/MultipleImgaeResponseModel.dart';
+import '../../Model/SavedModel.dart';
 import '../../Model/getPropertyResponsemodel.dart';
 
 part 'api.state.g.dart'; // File name ke hisab se .g.dart
 
 @RestApi(baseUrl: 'https://api.propertyleinnovation.com/api/v1')
+
 // @RestApi(baseUrl: 'http://192.168.1.22:9999/api/v1')
+
+//@RestApi(baseUrl: 'http://192.168.1.22:9999/api/v1')
+
 abstract class APIStateNetwork {
 
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
@@ -78,8 +85,9 @@ abstract class APIStateNetwork {
   );
 
   @POST("/user/get-list")
-  Future<PropertyGetReponseModel> getListProperty(@Body() PropertyListBodyModel body);
-
+  Future<PropertyGetReponseModel> getListProperty(
+    @Body() PropertyListBodyModel body,
+  );
 
   @POST("/user/loanQuery")
   Future<LoanQueryResModel> loanQuery(@Body() LoanQueryBodyModel body);
@@ -90,8 +98,18 @@ abstract class APIStateNetwork {
   @POST("/user/getMyProperty")
   Future<GetMyPropertyResModel> getMyProperty();
 
+  @POST("/user/getMyPropertyContantList")
+  Future<SavedListModel> getMyPropertyContantList();
+
   @POST("/user/get-property-by-id")
   Future<GetMyPropertyDetailsResModel> getMyPropertyDetails(
     @Body() GetMyPropertyDetailsBodyModel body,
   );
+
+  @POST("/user/saveContactInProperty")
+  Future<SaveContactInPropertyResModel> saveContactInProperty(
+    @Body() SaveContactInPropertyBodyModel body,
+  );
 }
+
+

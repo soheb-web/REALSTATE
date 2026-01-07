@@ -256,6 +256,7 @@ extension PaddingExt on Widget {
 
 */
 
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -347,7 +348,14 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
-                      child: Text("Buy", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      child: Text(
+                        "Buy",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -362,11 +370,20 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
                   child: Container(
                     height: 50.h,
                     decoration: BoxDecoration(
-                      color: !isBuy ? const Color(0xFFFF6725) : Colors.grey[200],
+                      color: !isBuy
+                          ? const Color(0xFFFF6725)
+                          : Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
-                      child: Text("Rent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      child: Text(
+                        "Rent",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -379,16 +396,41 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
           Expanded(
             child: propertyAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text("Error: $err", style: const TextStyle(color: Colors.red))),
+              error: (err, stack) {
+                log(stack.toString());
+                return Center(
+                  child: Text(
+                    "Error: $err",
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              },
               data: (response) {
-                if (response.data?.list == null || response.data!.list!.isEmpty) {
+                if (response.data?.list == null ||
+                    response.data!.list!.isEmpty) {
                   return const Center(child: Text("No properties found"));
                 }
 
-                // Final Filtering (Frontend pe guarantee ke liye)
+                // // Final Filtering (Frontend pe guarantee ke liye)
+                // final filteredList = response.data!.list!.where((property) {
+                //   final matchesProperty =
+                //       property.property?.toUpperCase() ==
+                //       widget.property.toUpperCase();
+                //   final matchesCategory =
+                //       property.listingCategory?.toLowerCase() ==
+                //       (isBuy ? "sell" : "rent");
+                //   return matchesProperty && matchesCategory;
+                // }).toList();
+
                 final filteredList = response.data!.list!.where((property) {
-                  final matchesProperty = property.property?.toUpperCase() == widget.property.toUpperCase();
-                  final matchesCategory = property.listingCategory?.toLowerCase() == (isBuy ? "buy" : "rent");
+                  final matchesProperty =
+                      property.property?.toLowerCase() ==
+                      widget.property.toLowerCase();
+
+                  final matchesCategory =
+                      property.listingCategory?.toLowerCase() ==
+                      (isBuy ? "buy" : "rent");
+
                   return matchesProperty && matchesCategory;
                 }).toList();
 
@@ -414,12 +456,13 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
                     final prop = filteredList[i];
                     return InkWell(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   CupertinoPageRoute(
-                        //     builder: (context) => PerticulerPropertyPage(property: prop),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) =>
+                                PerticulerPropertyPage(data: prop),
+                          ),
+                        );
                       },
                       child: PropertyCard(property: prop),
                     );
@@ -433,12 +476,24 @@ class _PropertyPageCatState extends ConsumerState<PropertyPageCat> {
       floatingActionButton: FloatingActionButton.extended(
         elevation: 8,
         backgroundColor: const Color(0xff27D045),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40.r),
+        ),
         onPressed: () {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => const AboutUsPage()));
+          Navigator.push(
+            context,
+            CupertinoPageRoute(builder: (context) => const AboutUsPage()),
+          );
         },
         icon: SvgPicture.asset("assets/Svg/whatsapp.svg"),
-        label: Text("Let’s Connect", style: GoogleFonts.inter(fontSize: 12.sp, fontWeight: FontWeight.w600, color: Colors.white)),
+        label: Text(
+          "Let’s Connect",
+          style: GoogleFonts.inter(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -467,15 +522,23 @@ class PropertyCard extends StatelessWidget {
         image: DecorationImage(
           image: NetworkImage(img),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.4),
+            BlendMode.darken,
+          ),
         ),
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Center(
             child: Text(
               title,
-              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -485,10 +548,16 @@ class PropertyCard extends StatelessWidget {
             right: 10,
             child: Container(
               padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Text(
                 "₹${property.price ?? 'N/A'}",
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -500,5 +569,6 @@ class PropertyCard extends StatelessWidget {
 }
 
 extension PaddingExt on Widget {
-  Widget paddingAll(double value) => Padding(padding: EdgeInsets.all(value), child: this);
+  Widget paddingAll(double value) =>
+      Padding(padding: EdgeInsets.all(value), child: this);
 }

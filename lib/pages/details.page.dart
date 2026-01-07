@@ -542,7 +542,8 @@ class _DetailsPageState extends State<DetailsPage> {
                             Icon(item.icon, size: 28.sp, color: Colors.black87),
                             SizedBox(height: 10.h),
                             Text(
-                              item.title,
+                              // item.title,
+                              amenitiesList[index].title,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 12.sp,
@@ -762,7 +763,7 @@ class AmenityModel {
 
 /// 🔹 Amenities Data (API ready)
 final List<AmenityModel> amenitiesList = [
-  AmenityModel("Partial Power\nBackup", Icons.battery_charging_full),
+  AmenityModel("Partial Power\nBackup", Icons.car_crash_outlined),
   AmenityModel("Entrance\nLobby", Icons.meeting_room_outlined),
   AmenityModel("Security\nCabin", Icons.security),
   AmenityModel("Fire\nSprinklers", Icons.local_fire_department_outlined),

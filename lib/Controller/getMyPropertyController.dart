@@ -5,6 +5,8 @@ import 'package:realstate/Model/getMyPropertyResModel.dart';
 import 'package:realstate/core/network/api.state.dart';
 import 'package:realstate/core/utils/preety.dio.dart';
 
+import '../Model/SavedModel.dart';
+
 final getMyPropertyController = FutureProvider<GetMyPropertyResModel>((
   ref,
 ) async {
@@ -22,3 +24,10 @@ final getMyPropertyDetailsController =
         GetMyPropertyDetailsBodyModel(id: body),
       );
     });
+
+final getMyPropertyContantListController = FutureProvider<SavedListModel>((
+    ref,
+    ) async {
+  final service = APIStateNetwork(createDio());
+  return await service.getMyPropertyContantList();
+});

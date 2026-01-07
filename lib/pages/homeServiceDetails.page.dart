@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:realstate/pages/add.service.page.dart';
+import 'package:realstate/Model/homeGetServiceCateogryModel.dart';
 
-class HomeServiceDetailsPage extends StatelessWidget {
-  const HomeServiceDetailsPage({super.key});
+class HomeServiceDetailsPage extends StatefulWidget {
+  final ListElement service;
+  const HomeServiceDetailsPage({super.key, required this.service});
+
+  @override
+  State<HomeServiceDetailsPage> createState() => _HomeServiceDetailsPageState();
+}
+
+class _HomeServiceDetailsPageState extends State<HomeServiceDetailsPage> {
+  static const primaryColor = Color(0xFFFF5722);
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFFFF5722);
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
 
@@ -16,12 +23,12 @@ class HomeServiceDetailsPage extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: EdgeInsets.all(16.w),
         child: SizedBox(
-          height: 50.h,
+          height: 52.h,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(14.r),
               ),
             ),
             onPressed: () {},
@@ -51,18 +58,31 @@ class HomeServiceDetailsPage extends StatelessWidget {
               SizedBox(width: 10.w),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 1,
-                    ),
-                  );
-                },
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    widget.service.image ??
+                        "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 1,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.network(
+                        "https://images.unsplash.com/photo-1581578731548-c64695cc6952",
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                  Container(color: Colors.black.withOpacity(0.25)),
+                ],
               ),
             ),
           ),
@@ -74,137 +94,295 @@ class HomeServiceDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// TITLE + PRICE
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Toilet Repair Service",
-                          style: GoogleFonts.inter(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        "₹499",
-                        style: GoogleFonts.inter(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
+                  /// TITLE
+                  Text(
+                    widget.service.name ?? "",
+                    style: GoogleFonts.inter(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
 
-                  SizedBox(height: 8.h),
+                  SizedBox(height: 6.h),
 
-                  /// RATING
+                  /// ⭐ RATING
                   Row(
                     children: [
-                      Icon(Icons.star, color: Colors.amber, size: 18.sp),
+                      const Icon(Icons.star, color: Colors.amber, size: 18),
                       SizedBox(width: 4.w),
                       Text(
-                        "4.8 (120 reviews)",
-                        style: GoogleFonts.inter(fontSize: 13.sp),
+                        "4.6",
+                        style: GoogleFonts.inter(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        " (1.2k reviews)",
+                        style: GoogleFonts.inter(
+                          fontSize: 12.sp,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ],
                   ),
 
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 14.h),
 
-                  /// DESCRIPTION
-                  _sectionTitle("Service Description"),
-                  Text(
-                    "Fast, reliable toilet fixes that restore proper function. Our professionals use modern tools to diagnose and repair efficiently.",
-                    style: GoogleFonts.inter(
-                      fontSize: 13.sp,
-                      color: Colors.grey.shade700,
-                      height: 1.6,
-                    ),
-                  ),
-
-                  SizedBox(height: 24.h),
-
-                  /// WHY CHOOSE US
-                  _sectionTitle("Why Choose Us"),
-                  Wrap(
-                    spacing: 10.w,
-                    children: const [
-                      _ChipItem("Tech Expertise"),
-                      _ChipItem("Advanced Tools"),
-                      _ChipItem("Smart Solutions"),
+                  /// INFO CHIPS
+                  Row(
+                    children: [
+                      _chip("60 min"),
+                      SizedBox(width: 8.w),
+                      _chip("30 days warranty"),
+                      SizedBox(width: 8.w),
+                      _chip("Verified"),
                     ],
                   ),
 
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 18.h),
 
-                  /// GALLERY (REUSED FEATURED PROJECT)
-                  _sectionTitle("Service Gallery"),
-                  SizedBox(
-                    height: 180.h,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        FeaturedProject(
-                          imageUrl:
-                              'https://images.finehomebuilding.com/app/uploads/2016/04/09114955/021181bs116-01_xlg.jpg',
-                          title: 'Drain Repair',
-                          subtitle: 'Complete overhaul',
-                        ),
-                        FeaturedProject(
-                          imageUrl:
-                              'https://www.thespruce.com/thmb/e-MxaOBy4AKp4JW1XFZGbrkDaIw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/how-to-install-a-sink-drain-2718789_hero_5078-64538f6f90d545c7af0728e4bf8f894e.jpg',
-                          title: 'Sink Setup',
-                          subtitle: 'Kitchen installation',
-                        ),
-                      ],
-                    ),
-                  ),
+                  /// PRICE CARD
+                  _priceCard(),
 
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 22.h),
 
-                  /// PRICING
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 10),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.price_check,
-                          size: 40.sp,
-                          color: primaryColor,
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          "Affordable Pricing",
-                          style: GoogleFonts.inter(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          "Transparent pricing with no hidden charges.",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(fontSize: 13.sp),
-                        ),
-                      ],
-                    ),
-                  ),
+                  /// SERVICE DETAILS
+                  _serviceDetailsSection(),
 
-                  SizedBox(height: 30.h),
+                  SizedBox(height: 22.h),
+
+                  /// WHY CHOOSE US
+                  _whyChooseUs(),
+
+                  SizedBox(height: 40.h),
                 ],
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // ================= HELPERS ===========================
+  // =====================================================
+
+  Widget _chip(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.inter(
+          fontSize: 12.sp,
+          color: primaryColor,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _priceCard() {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(color: Colors.black12.withOpacity(0.08), blurRadius: 10),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Starting from",
+                style: GoogleFonts.inter(fontSize: 12.sp, color: Colors.grey),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                "₹499",
+                style: GoogleFonts.inter(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: primaryColor,
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Text(
+              "Best Price",
+              style: GoogleFonts.inter(
+                fontSize: 12.sp,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _serviceType() {
+    return widget.service.name?.toLowerCase() ?? "";
+  }
+
+  Widget _serviceDetailsSection() {
+    final type = _serviceType();
+
+    if (type.contains("plumber")) {
+      return _infoCard(
+        title: "Plumber Services",
+        description:
+            "Professional plumbing services for homes and offices with quick and reliable solutions.",
+        points: [
+          "Tap & Pipe Leakage Repair",
+          "Bathroom & Toilet Fittings",
+          "Water Tank Cleaning",
+          "Kitchen Sink Repair",
+        ],
+      );
+    }
+
+    if (type.contains("carpenter")) {
+      return _infoCard(
+        title: "Carpenter Services",
+        description:
+            "Expert carpenter services for furniture work and wooden fittings with premium finish.",
+        points: [
+          "Furniture Repair & Assembly",
+          "Door & Window Fixing",
+          "Modular Furniture Work",
+          "Custom Wood Design",
+        ],
+      );
+    }
+
+    if (type.contains("electrician")) {
+      return _infoCard(
+        title: "Electrician Services",
+        description:
+            "Certified electricians for electrical installation, repair and maintenance.",
+        points: [
+          "Wiring & Switch Repair",
+          "Fan & Light Installation",
+          "Power Backup Setup",
+          "Electrical Safety Check",
+        ],
+      );
+    }
+
+    if (type.contains("painter")) {
+      return _infoCard(
+        title: "Painting Services",
+        description:
+            "Interior and exterior painting services with premium quality finish.",
+        points: [
+          "Interior Wall Painting",
+          "Exterior Painting",
+          "Wall Texture Design",
+          "Waterproof Coating",
+        ],
+      );
+    }
+
+    return const SizedBox();
+  }
+
+  Widget _infoCard({
+    required String title,
+    required String description,
+    required List<String> points,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(color: Colors.black12.withOpacity(0.06), blurRadius: 10),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            description,
+            style: GoogleFonts.inter(
+              fontSize: 13.sp,
+              color: Colors.grey.shade600,
+              height: 1.5,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          ...points.map(
+            (e) => Padding(
+              padding: EdgeInsets.only(bottom: 6.h),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, size: 18, color: primaryColor),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(e, style: GoogleFonts.inter(fontSize: 13.sp)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _whyChooseUs() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Why choose us?",
+          style: GoogleFonts.inter(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 12.h),
+        _whyItem(Icons.verified, "Verified professionals"),
+        _whyItem(Icons.timer, "On-time service"),
+        _whyItem(Icons.support_agent, "24/7 customer support"),
+      ],
+    );
+  }
+
+  Widget _whyItem(IconData icon, String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: primaryColor),
+          SizedBox(width: 8.w),
+          Text(text, style: GoogleFonts.inter(fontSize: 13.sp)),
         ],
       ),
     );
@@ -222,30 +400,6 @@ class HomeServiceDetailsPage extends StatelessWidget {
         ),
         child: Icon(icon, size: 20),
       ),
-    );
-  }
-
-  Widget _sectionTitle(String text) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 6.h),
-      child: Text(
-        text,
-        style: GoogleFonts.inter(fontSize: 16.sp, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-}
-
-class _ChipItem extends StatelessWidget {
-  final String label;
-  const _ChipItem(this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(label),
-      backgroundColor: Colors.orange.shade50,
-      labelStyle: GoogleFonts.inter(fontSize: 12.sp),
     );
   }
 }

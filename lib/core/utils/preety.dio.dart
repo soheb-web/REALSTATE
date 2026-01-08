@@ -18,24 +18,27 @@ Dio createDio() {
       responseHeader: true,
     ),
   );
-  var box = Hive.box("userdata");
-  var token = box.get("token");
+
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {
+        final box = Hive.box("userdata");
+        final token = box.get("token"); // 🔥 har request par fresh token
+
         options.headers.addAll({
           'Accept': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         });
         handler.next(options);
       },
-      onResponse: (response, handler) {
+      onResponse: (response, handler) async {
         if (response.data['code'] == 401 || response.data['code'] == 3) {
           navigatorKey.currentState?.pushAndRemoveUntil(
             CupertinoPageRoute(builder: (_) => LoginPage()),
             (route) => false,
           );
-          box.clear();
+          final box = Hive.box("userdata");
+          await box.clear(); // 🔥 await add किया
           Fluttertoast.showToast(
             msg: response.data['message'],
             gravity: ToastGravity.BOTTOM,
@@ -138,8 +141,10 @@ Dio createDio() {
       //   handler.next(e);
       // },
      
-      onError: (error, handler) {
+      onError: (error, handler) async{
         if (error.response!.statusCode == 401) {
+          final box = Hive.box("userdata");
+          await box.clear();
           Fluttertoast.showToast(
             msg: "Token expire please login again.",
             backgroundColor: Colors.red,
@@ -149,7 +154,6 @@ Dio createDio() {
             CupertinoPageRoute(builder: (_) => LoginPage()),
             (route) => false,
           );
-          
         } else {
           log("Global context is null, cannot show SnackBar or navigate");
         }

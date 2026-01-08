@@ -54,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
           CupertinoPageRoute(builder: (context) => RealEstateHomePage()),
           (route) => false,
         );
+
         Fluttertoast.showToast(msg: response.message ?? "");
       } else {
         Fluttertoast.showToast(msg: response.message ?? "Error");

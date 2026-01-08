@@ -2,9 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:realstate/Controller/getMyPropertyController.dart';
 import 'package:realstate/Model/saveContactInPropertyBodyModel.dart';
 import 'package:realstate/core/network/api.state.dart';
 import 'package:realstate/core/utils/preety.dio.dart';
@@ -99,162 +101,203 @@ class _PerticulerPropertyPageState extends State<PerticulerPropertyPage> {
     "Delhi",
   ];
   final PageController _pageController = PageController();
-  bool isLoading = false;
+
   void showContactDialog(BuildContext context) {
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final phoneController = TextEditingController();
 
-    bool agreeToContact = false; // REQUIRED
-    bool interestedHomeLoan = false; // OPTIONAL
+    // Dialog ke state ko manage karne ke liye variables
+    bool agreeToContact = false;
+    bool interestedHomeLoan = false;
+    bool isLoading = false; // Isse yaha initialize karein
+
+    const primaryColor = Color(0xffFF6A2A);
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
+            // setState ka naam badal diya taki confusion na ho
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
-              title: const Text("Contact Details"),
+              title: const Text(
+                "Contact Details",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    /// NAME
                     TextField(
                       controller: nameController,
                       decoration: const InputDecoration(
                         labelText: "Name",
+                        prefixIcon: Icon(Icons.person, color: primaryColor),
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    /// EMAIL
                     TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         labelText: "Email",
+                        prefixIcon: Icon(Icons.email, color: primaryColor),
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
-
-                    /// PHONE
                     TextField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       maxLength: 10,
                       decoration: const InputDecoration(
                         labelText: "Phone",
+                        prefixIcon: Icon(Icons.phone, color: primaryColor),
                         border: OutlineInputBorder(),
                         counterText: "",
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
 
-                    /// REQUIRED CHECKBOX (LEFT)
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: agreeToContact,
-                          onChanged: (value) {
-                            setState(() {
-                              agreeToContact = value ?? false;
-                            });
-                          },
-                        ),
-                        const Expanded(
-                          child: Text(
-                            "I agree to be contacted",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ],
+                    // Required Checkbox
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        "I agree to be contacted",
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      value: agreeToContact,
+                      activeColor: primaryColor,
+                      // Sahi parameter name niche hai:
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (val) =>
+                          setDialogState(() => agreeToContact = val ?? false),
                     ),
 
-                    /// OPTIONAL CHECKBOX
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: interestedHomeLoan,
-                          onChanged: (value) {
-                            setState(() {
-                              interestedHomeLoan = value ?? false;
-                            });
-                          },
-                        ),
-                        const Expanded(
-                          child: Text(
-                            "I am interested in Home Loan",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ],
+                    // Optional Checkbox
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        "Interested in Home Loan",
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      value: interestedHomeLoan,
+                      activeColor: primaryColor,
+                      // Sahi parameter name niche hai:
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (val) => setDialogState(
+                        () => interestedHomeLoan = val ?? false,
+                      ),
                     ),
                   ],
                 ),
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (nameController.text.isEmpty ||
-                        emailController.text.isEmpty ||
-                        phoneController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please fill all fields")),
-                      );
-                      return;
-                    }
-
-                    if (!agreeToContact) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please agree to be contacted"),
+                Consumer(
+                  builder: (context, ref, child) {
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      );
-                      return;
-                    }
-                    setState(() {
-                      isLoading = true;
-                    });
+                        fixedSize: const Size(
+                          120,
+                          45,
+                        ), // Fixed size taaki loader ke time button shrank na ho
+                      ),
+                      onPressed: isLoading
+                          ? null
+                          : () async {
+                              if (nameController.text.isEmpty ||
+                                  emailController.text.isEmpty ||
+                                  phoneController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Please fill all fields"),
+                                  ),
+                                );
+                                return;
+                              }
+                              if (!agreeToContact) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Please agree to be contacted",
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
 
-                    final body = SaveContactInPropertyBodyModel(
-                      email: emailController.text,
-                      name: nameController.text,
-                      phone: phoneController.text,
-                      propertyId: widget.data.id.toString(),
+                              setDialogState(() => isLoading = true);
+
+                              try {
+                                // Body model aur API call
+                                final body = SaveContactInPropertyBodyModel(
+                                  email: emailController.text,
+                                  name: nameController.text,
+                                  phone: phoneController.text,
+                                  propertyId: widget.data.id.toString(),
+                                );
+
+                                final service = APIStateNetwork(createDio());
+                                final response = await service
+                                    .saveContactInProperty(body);
+
+                                if (response.code == 0 ||
+                                    response.error == false) {
+                                  Fluttertoast.showToast(
+                                    msg: response.message ?? "Success",
+                                  );
+                                  ref.invalidate(
+                                    getMyPropertyContantListController,
+                                  );
+
+                                  Navigator.pop(context);
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: response.message ?? "Error",
+                                  );
+                                }
+                              } catch (e) {
+                                debugPrint("Error: $e");
+                              } finally {
+                                // Check if mounted to avoid errors if dialog closed
+                                setDialogState(() => isLoading = false);
+                              }
+                            },
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Submit",
+                              style: TextStyle(color: Colors.white),
+                            ),
                     );
-                    try {
-                      final service = APIStateNetwork(createDio());
-                      final response = await service.saveContactInProperty(
-                        body,
-                      );
-                      if (response.code == 0 || response.error == false) {
-                        Fluttertoast.showToast(msg: "Sucess");
-                        Navigator.pop(context);
-                      } else {
-                        Fluttertoast.showToast(
-                          msg: response.message ?? "Error",
-                        );
-                      }
-                    } catch (e, st) {
-                      log(st.toString());
-                    } finally {
-                      setState(() {
-                        isLoading = false;
-                      });
-                    }
                   },
-                  child: const Text("Submit"),
                 ),
               ],
             );

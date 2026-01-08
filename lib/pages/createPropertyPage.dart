@@ -810,6 +810,7 @@ class _CreatePropertyScreenState extends ConsumerState<CreatePropertyScreen> {
             // _buildTextField('Email', controller: _emailController),
             // const SizedBox(height: 16),
             // _buildTextField('Phone', controller: _phoneController),
+            
             const Text(
               'Contact Information',
               style: TextStyle(

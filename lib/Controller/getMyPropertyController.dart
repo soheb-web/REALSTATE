@@ -5,12 +5,13 @@ import 'package:realstate/Model/getMyPropertyResModel.dart';
 import 'package:realstate/core/network/api.state.dart';
 import 'package:realstate/core/utils/preety.dio.dart';
 
-final getMyPropertyController = FutureProvider<GetMyPropertyResModel>((
-  ref,
-) async {
-  final service = APIStateNetwork(createDio());
-  return await service.getMyProperty();
-});
+import '../Model/SavedModel.dart';
+
+final getMyPropertyController =
+    FutureProvider.autoDispose<GetMyPropertyResModel>((ref) async {
+      final service = APIStateNetwork(createDio());
+      return await service.getMyProperty();
+    });
 
 final getMyPropertyDetailsController =
     FutureProvider.family<GetMyPropertyDetailsResModel, String>((
@@ -21,4 +22,10 @@ final getMyPropertyDetailsController =
       return await service.getMyPropertyDetails(
         GetMyPropertyDetailsBodyModel(id: body),
       );
+    });
+
+final getMyPropertyContantListController =
+    FutureProvider.autoDispose<SavedListModel>((ref) async {
+      final service = APIStateNetwork(createDio());
+      return await service.getMyPropertyContantList();
     });

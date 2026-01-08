@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -138,8 +137,6 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                   ),
 
                   const SizedBox(height: 22),
-
-                  /// ==== PASSWORD ====
 
                   /// ==== SIGNt IN BUTTON ====
                   Center(

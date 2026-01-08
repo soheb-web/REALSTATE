@@ -143,180 +143,285 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return CommonLoader(
       isLoading: isLoading,
       child: Scaffold(
-        backgroundColor: const Color(0xffF6F7FB),
+        backgroundColor: const Color(
+          0xffF2F5FA,
+        ), // Light Professional Gray-Blue
         appBar: AppBar(
-          title: const Text("Edit Profile"),
-          backgroundColor: const Color(0xffF6F7FB),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.black,
+              size: 20,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            "Edit Profile",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w800,
+              fontSize: 18.sp,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
           elevation: 0,
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(left: 20.w, right: 20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Profile Image
-                Center(
-                  child: GestureDetector(
-                    onTap: showImagePicker,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        CircleAvatar(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              SizedBox(height: 10.h),
+
+              /// --- Profile Image Section ---
+              Center(
+                child: Stack(
+                  children: [
+                    // Glow effect behind image
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xffE86A34).withOpacity(0.5),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 64.r,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
                           radius: 60.r,
-                          backgroundColor: Colors.grey.shade300,
+                          backgroundColor: Colors.grey.shade200,
                           backgroundImage: profileImage != null
                               ? FileImage(profileImage!)
                               : (existingImage.isNotEmpty
                                         ? NetworkImage(existingImage)
                                         : const NetworkImage(
-                                            "https://i.pravatar.cc/150",
+                                            "https://t4.ftcdn.net/jpg/16/74/69/27/240_F_1674692759_KcsTyCBrF888fdlD7eDFrGRyEUbniWXj.jpg",
                                           ))
                                     as ImageProvider,
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.blue,
-                            child: const Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                              size: 16,
-                            ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 5,
+                      right: 5,
+                      child: GestureDetector(
+                        onTap: showImagePicker,
+                        child: Container(
+                          height: 36.h,
+                          width: 36.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xffE86A34),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                Text(
-                  "Name",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff0E1A35),
-                  ),
-                ),
-                SizedBox(height: 15.h),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: "Name",
-                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                    suffixIcon: Icon(Icons.edit, color: Colors.grey),
-                    hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Color(0xffE86A34)),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                Text(
-                  "Email",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff0E1A35),
-                  ),
-                ),
-                SizedBox(height: 15.h),
-                TextField(
-                  onTap: () {
-                    Fluttertoast.showToast(
-                      msg: "Registered email cannot be updated",
-                    );
-                  },
-                  controller: emailControler,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: "Email",
-                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                    hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                Text(
-                  "Mobile Number",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff0E1A35),
-                  ),
-                ),
-                SizedBox(height: 15.h),
-                TextField(
-                  onTap: () {
-                    Fluttertoast.showToast(
-                      msg: "Registered phone number cannot be updated",
-                    );
-                  },
-                  readOnly: true,
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: "Mobile Number",
-                    labelStyle: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                    hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30.h),
-                /// Save Button
-                InkWell(
-                  onTap: isLoading ? null : updateProfile,
-                  child: Container(
-                    height: 60.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: isLoading ? Colors.grey : Color(0xffE86A34),
-                      borderRadius: BorderRadius.circular(40.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Update",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w600,
+                          child: const Icon(
+                            Icons.edit_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 30.h),
+
+              /// --- Main Form Card ---
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20.w),
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInputField(
+                      label: "FULL NAME",
+                      controller: nameController,
+                      icon: Icons.person_rounded,
+                      isReadOnly: false,
+                    ),
+                    SizedBox(height: 20.h),
+
+                    _buildInputField(
+                      label: "EMAIL ADDRESS",
+                      controller: emailControler,
+                      icon: Icons.email_rounded,
+                      isReadOnly: true,
+                      onTap: () => Fluttertoast.showToast(
+                        msg: "Email cannot be updated",
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+
+                    _buildInputField(
+                      label: "MOBILE NUMBER",
+                      controller: phoneController,
+                      icon: Icons.phone_android_rounded,
+                      isReadOnly: true,
+                      onTap: () => Fluttertoast.showToast(
+                        msg: "Phone cannot be updated",
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.only(top: 12.h, left: 4.w),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 14.sp,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            "Contact details are verified and locked.",
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 40.h),
+
+              /// --- Update Button ---
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: InkWell(
+                  onTap: isLoading ? null : updateProfile,
+                  borderRadius: BorderRadius.circular(18.r),
+                  child: Container(
+                    height: 58.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18.r),
+                      gradient: LinearGradient(
+                        colors: isLoading
+                            ? [Colors.grey, Colors.grey]
+                            : [
+                                const Color(0xffE86A34),
+                                const Color(0xffFF8C5A),
+                              ],
+                      ),
+                      boxShadow: [
+                        if (!isLoading)
+                          BoxShadow(
+                            color: const Color(0xffE86A34).withOpacity(0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                          ),
+                      ],
+                    ),
+                    child: Center(
+                      child: isLoading
+                          ? const CupertinoActivityIndicator(
+                              color: Colors.white,
+                            )
+                          : Text(
+                              "Update Profile",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 20.h),
-              ],
-            ),
+              ),
+              SizedBox(height: 40.h),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInputField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    required bool isReadOnly,
+    VoidCallback? onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w700,
+            color: Colors.grey.shade500,
+            letterSpacing: 1.2,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        TextField(
+          controller: controller,
+          readOnly: isReadOnly,
+          onTap: onTap,
+          style: TextStyle(
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w600,
+            color: isReadOnly ? Colors.grey.shade600 : const Color(0xff0E1A35),
+          ),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: const Color(0xffE86A34), size: 20),
+            suffixIcon: isReadOnly
+                ? null
+                : const Icon(Icons.edit_outlined, size: 18, color: Colors.grey),
+            filled: true,
+            fillColor: isReadOnly ? const Color(0xffF9FAFB) : Colors.white,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 16.h,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide(color: Colors.grey.shade200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(
+                color: Color(0xffE86A34),
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

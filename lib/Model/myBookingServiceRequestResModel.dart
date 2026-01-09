@@ -71,9 +71,9 @@ class ListElement {
     int? createdAt;
     int? updatedAt;
     int? v;
+    String? rejectedReason;
     ServiceBoy? serviceBoy;
     String? serviceProviderArrivalTime;
-    String? rejectedReason;
 
     ListElement({
         this.id,
@@ -90,9 +90,9 @@ class ListElement {
         this.createdAt,
         this.updatedAt,
         this.v,
+        this.rejectedReason,
         this.serviceBoy,
         this.serviceProviderArrivalTime,
-        this.rejectedReason,
     });
 
     factory ListElement.fromJson(Map<String, dynamic> json) => ListElement(
@@ -110,9 +110,9 @@ class ListElement {
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
         v: json["__v"],
+        rejectedReason: json["rejectedReason"],
         serviceBoy: json["serviceBoy"] == null ? null : ServiceBoy.fromJson(json["serviceBoy"]),
         serviceProviderArrivalTime: json["serviceProviderArrivalTime"],
-        rejectedReason: json["rejectedReason"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -130,9 +130,9 @@ class ListElement {
         "createdAt": createdAt,
         "updatedAt": updatedAt,
         "__v": v,
+        "rejectedReason": rejectedReason,
         "serviceBoy": serviceBoy?.toJson(),
         "serviceProviderArrivalTime": serviceProviderArrivalTime,
-        "rejectedReason": rejectedReason,
     };
 }
 
@@ -161,8 +161,8 @@ class ServiceBoy {
 }
 
 class ServiceType {
-    ServiceTypeId? id;
-    ServiceTypeName? name;
+    String? id;
+    String? name;
     String? image;
 
     ServiceType({
@@ -172,47 +172,23 @@ class ServiceType {
     });
 
     factory ServiceType.fromJson(Map<String, dynamic> json) => ServiceType(
-        id: serviceTypeIdValues.map[json["_id"]]!,
-        name: serviceTypeNameValues.map[json["name"]]!,
+        id: json["_id"],
+        name: json["name"],
         image: json["image"],
     );
 
     Map<String, dynamic> toJson() => {
-        "_id": serviceTypeIdValues.reverse[id],
-        "name": serviceTypeNameValues.reverse[name],
+        "_id": id,
+        "name": name,
         "image": image,
     };
 }
 
-enum ServiceTypeId {
-    THE_6942501_ED4_E8_A55841_FEE062,
-    THE_69425_CE1_CB4_E5371_E2_D03_F41,
-    THE_69425_D19_CB4_E5371_E2_D03_F44
-}
-
-final serviceTypeIdValues = EnumValues({
-    "6942501ed4e8a55841fee062": ServiceTypeId.THE_6942501_ED4_E8_A55841_FEE062,
-    "69425ce1cb4e5371e2d03f41": ServiceTypeId.THE_69425_CE1_CB4_E5371_E2_D03_F41,
-    "69425d19cb4e5371e2d03f44": ServiceTypeId.THE_69425_D19_CB4_E5371_E2_D03_F44
-});
-
-enum ServiceTypeName {
-    CARPENTER,
-    PLUMBER,
-    SECURITY_GUARD
-}
-
-final serviceTypeNameValues = EnumValues({
-    "Carpenter": ServiceTypeName.CARPENTER,
-    "Plumber": ServiceTypeName.PLUMBER,
-    "Security Guard": ServiceTypeName.SECURITY_GUARD
-});
-
 class UserId {
-    UserIdId? id;
-    UserIdName? name;
+    String? id;
+    String? name;
     String? phone;
-    Email? email;
+    String? email;
     String? image;
 
     UserId({
@@ -224,60 +200,18 @@ class UserId {
     });
 
     factory UserId.fromJson(Map<String, dynamic> json) => UserId(
-        id: userIdIdValues.map[json["_id"]]!,
-        name: userIdNameValues.map[json["name"]]!,
+        id: json["_id"],
+        name: json["name"],
         phone: json["phone"],
-        email: emailValues.map[json["email"]]!,
+        email: json["email"],
         image: json["image"],
     );
 
     Map<String, dynamic> toJson() => {
-        "_id": userIdIdValues.reverse[id],
-        "name": userIdNameValues.reverse[name],
+        "_id": id,
+        "name": name,
         "phone": phone,
-        "email": emailValues.reverse[email],
+        "email": email,
         "image": image,
     };
-}
-
-enum Email {
-    RAJDHAKAD077_GMAIL_COM,
-    SAHILJOYA_GMAIL_COM
-}
-
-final emailValues = EnumValues({
-    "rajdhakad077@gmail.com": Email.RAJDHAKAD077_GMAIL_COM,
-    "sahiljoya@gmail.com": Email.SAHILJOYA_GMAIL_COM
-});
-
-enum UserIdId {
-    THE_6938_FF734_B0788_D952_CBDDB0,
-    THE_695927_C105_C0_A9838_FB2956_F
-}
-
-final userIdIdValues = EnumValues({
-    "6938ff734b0788d952cbddb0": UserIdId.THE_6938_FF734_B0788_D952_CBDDB0,
-    "695927c105c0a9838fb2956f": UserIdId.THE_695927_C105_C0_A9838_FB2956_F
-});
-
-enum UserIdName {
-    RAJ,
-    SAHIL_KHAN
-}
-
-final userIdNameValues = EnumValues({
-    "raj": UserIdName.RAJ,
-    "Sahil khan": UserIdName.SAHIL_KHAN
-});
-
-class EnumValues<T> {
-    Map<String, T> map;
-    late Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
-    }
 }

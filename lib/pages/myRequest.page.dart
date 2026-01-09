@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -131,7 +133,7 @@ class MyRequestPage extends ConsumerWidget {
                               children: [
                                 Text(
                                   // item.serviceType?.name ?? "Service",
-                                  item.serviceType!.name!.name ?? "",
+                                  item.serviceType!.name ?? "",
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15.sp,
@@ -257,7 +259,10 @@ class MyRequestPage extends ConsumerWidget {
             },
           );
         },
-        error: (error, stackTrace) => Center(child: Text("Error: $error")),
+        error: (error, stackTrace) {
+          log(stackTrace.toString());
+          return Center(child: Text("Error: $error"));
+        },
         loading: () =>
             const Center(child: CircularProgressIndicator(color: primaryColor)),
       ),
@@ -278,7 +283,7 @@ class MyRequestPage extends ConsumerWidget {
                 fontSize: 12.5.sp,
               ),
               children: [
-              TextSpan(
+                TextSpan(
                   text: "$title: ",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),

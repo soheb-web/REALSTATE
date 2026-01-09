@@ -51,113 +51,59 @@ Dio createDio() {
         handler.next(response);
       },
 
-      // onError: (DioException e, handler) {
-      //   String extractErrorMessage(dynamic data) {
-      //     String defaultMessage = "An error occurred";
-      //     if (data is Map<String, dynamic>) {
-      //       final errors = data['errors'];
-      //       if (errors is Map && errors.isNotEmpty) {
-      //         final firstError = errors.values.first;
-      //         if (firstError is List && firstError.isNotEmpty) {
-      //           return firstError.first.toString();
-      //         }
-      //       }
-      //     }
-      //     return defaultMessage;
-      //   }
-      //   if (e.requestOptions.path.contains("/api/login")) {
-      //     log("Invalid email or password");
+      // onError: (error, handler) async {
+      //   if (error.response!.statusCode == 401) {
+      //     final box = Hive.box("userdata");
+      //     await box.clear();
       //     Fluttertoast.showToast(
-      //       msg: "Invalid email or password",
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
+      //       msg: "Token expire please login again.",
       //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
+      //       toastLength: Toast.LENGTH_LONG,
       //     );
-      //     handler.next(e);
-      //     return;
-      //   }
-      //   if (e.response?.statusCode == 401) {
-      //     final errorMessage =
-      //         extractErrorMessage(e.response?.data) ?? "Unauthorized access";
-      //     log('Unauthorized Error: ${e.response?.data}');
-      //     Fluttertoast.showToast(
-      //       msg: errorMessage,
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
-      //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
-      //     );
-      //   } else if (e.response?.statusCode == 422) {
-      //     final errorMessage =
-      //         extractErrorMessage(e.response?.data) ??
-      //         "Please enter valid data";
-      //     log('Validation Error: ${e.response?.data}');
-      //     Fluttertoast.showToast(
-      //       msg: errorMessage,
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
-      //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
-      //     );
-      //   } else if (e.response?.statusCode == 404) {
-      //     final errorMessage =
-      //         extractErrorMessage(e.response?.data) ?? "Resource not found";
-      //     log('Not Found Error: ${e.response?.data}');
-      //     Fluttertoast.showToast(
-      //       msg: errorMessage,
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
-      //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
-      //     );
-      //   } else if (e.response?.statusCode == 403) {
-      //     final errorMessage =
-      //         extractErrorMessage(e.response?.data) ?? "Forbidden access";
-      //     log('Forbidden Error: ${e.response?.data}');
-      //     Fluttertoast.showToast(
-      //       msg: errorMessage,
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
-      //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
+      //     navigatorKey.currentState?.pushAndRemoveUntil(
+      //       CupertinoPageRoute(builder: (_) => LoginPage()),
+      //       (route) => false,
       //     );
       //   } else {
-      //     log('Unexpected Error: ${e.message}');
-      //     Fluttertoast.showToast(
-      //       msg: "An unexpected error occurred",
-      //       gravity: ToastGravity.BOTTOM,
-      //       toastLength: Toast.LENGTH_LONG,
-      //       backgroundColor: Colors.red,
-      //       textColor: Colors.white,
-      //       fontSize: 16.0,
-      //     );
+      //     log("Global context is null, cannot show SnackBar or navigate");
       //   }
-      //   handler.next(e);
+      //   return handler.next(error);
       // },
      
-      onError: (error, handler) async{
-        if (error.response!.statusCode == 401) {
-          final box = Hive.box("userdata");
-          await box.clear();
+     
+      onError: (DioException error, handler) async {
+        // 🔹 Case 1: Server / Internet issue
+        if (error.type == DioExceptionType.connectionError ||
+            error.type == DioExceptionType.connectionTimeout ||
+            error.type == DioExceptionType.receiveTimeout) {
           Fluttertoast.showToast(
-            msg: "Token expire please login again.",
+            msg: "Server not reachable. Please try again later.",
             backgroundColor: Colors.red,
             toastLength: Toast.LENGTH_LONG,
           );
-          navigatorKey.currentState?.pushAndRemoveUntil(
-            CupertinoPageRoute(builder: (_) => LoginPage()),
-            (route) => false,
-          );
-        } else {
-          log("Global context is null, cannot show SnackBar or navigate");
+          return handler.next(error);
         }
-        return handler.next(error);
+        // 🔹 Case 2: Response aaya hai (safe check)
+        if (error.response != null) {
+          final statusCode = error.response?.statusCode;
+          if (statusCode == 401) {
+            final box = Hive.box("userdata");
+            await box.clear();
+            Fluttertoast.showToast(
+              msg: "Session expired. Please login again.",
+              backgroundColor: Colors.red,
+              toastLength: Toast.LENGTH_LONG,
+            );
+            navigatorKey.currentState?.pushAndRemoveUntil(
+              CupertinoPageRoute(builder: (_) => LoginPage()),
+              (route) => false,
+            );
+          }
+        } else {
+          // 🔹 Unknown error
+          log("❌ Dio error without response: ${error.message}");
+        }
+        handler.next(error);
       },
     ),
   );

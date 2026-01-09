@@ -29,7 +29,6 @@ import 'package:realstate/Model/userProfileResModel.dart';
 import 'package:realstate/Model/verifyBodyModel.dart';
 import 'package:realstate/Model/verifyResModel.dart';
 import 'package:retrofit/retrofit.dart';
-
 import '../../Model/Body/PropertyListBodyModel.dart';
 import '../../Model/CityResponseModel.dart';
 import '../../Model/CreatePropertyResponseModel.dart';

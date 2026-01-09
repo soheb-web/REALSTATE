@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,13 +6,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realstate/Controller/getMyPropertyController.dart';
+import 'package:realstate/Controller/getPropertyController.dart';
 import 'package:realstate/Controller/likePropertyController.dart';
+import 'package:realstate/Model/Body/PropertyListBodyModel.dart';
 import 'package:realstate/Model/likePropertyBodyModel.dart';
 import 'package:realstate/Model/saveContactInPropertyBodyModel.dart';
 import 'package:realstate/core/network/api.state.dart';
 import 'package:realstate/core/utils/preety.dio.dart';
 import 'package:realstate/pages/details.page.dart';
 import 'package:realstate/Model/getPropertyResponsemodel.dart';
+import 'package:realstate/pages/home.page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PerticulerPropertyPage extends ConsumerStatefulWidget {
@@ -76,11 +78,19 @@ class _PerticulerPropertyPageState
     },
   ];
   late List<bool> selected, searchSelect;
+  late PropertyListBodyModel body;
+
   @override
   void initState() {
     super.initState();
     selected = List<bool>.filled(items.length, false);
     searchSelect = List<bool>.filled(searchItem.length, false);
+    body = PropertyListBodyModel(
+      size: 6,
+      pageNo: currentPage,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    );
   }
 
   double isValue = 0.0;
@@ -376,8 +386,12 @@ class _PerticulerPropertyPageState
     );
   }
 
+  int currentPage = 1;
+
   @override
   Widget build(BuildContext context) {
+    final propertyAsync = ref.watch(getPropertyController(body));
+
     final property = widget.data;
     final data = widget.data;
 
@@ -1333,7 +1347,6 @@ class _PerticulerPropertyPageState
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-
                     itemCount: amenities.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -1492,21 +1505,32 @@ class _PerticulerPropertyPageState
             ),
             // Categories Grid (3x3 + 1 extra)
             SizedBox(height: 15.h),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(12),
-              itemCount: 6,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12.h,
-                crossAxisSpacing: 12.w,
-                childAspectRatio: 0.55,
-              ),
-              itemBuilder: (context, index) {
-                return const PropertyCard();
+            propertyAsync.when(
+              loading: () => Center(child: const CircularProgressIndicator()),
+              error: (e, _) => Text(e.toString()),
+              data: (res) {
+                final list = res.data?.list ?? [];
+                if (res.data?.list == null || res.data!.list!.isEmpty) {
+                  return const Center(child: Text("No properties found"));
+                }
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(12),
+                  itemCount: list.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12.h,
+                    crossAxisSpacing: 12.w,
+                    childAspectRatio: 0.55,
+                  ),
+                  itemBuilder: (context, index) {
+                    return PropertyCard(property: list[index]);
+                  },
+                );
               },
             ),
+            SizedBox(height: 10.h),
             paginationBar(),
 
             Padding(
@@ -1609,210 +1633,501 @@ class _PerticulerPropertyPageState
       children: [
         // PREV
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-          ),
-          onPressed: () {},
-          child: Text(
-            "PREV",
-            style: GoogleFonts.inter(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
+          onPressed: currentPage > 1
+              ? () {
+                  setState(() {
+                    currentPage--;
+                    body = PropertyListBodyModel(
+                      size: 6,
+                      pageNo: currentPage,
+                      sortBy: 'createdAt',
+                      sortOrder: 'desc',
+                    );
+                  });
+                }
+              : null, // page 1 pe disable
+          child: const Text("PREV"),
         ),
 
         const SizedBox(width: 10),
 
-        // PAGE NUMBERS
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-            ),
-            onPressed: () {},
-            child: Text(
-              "0",
-              style: GoogleFonts.inter(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
+        Text("Page $currentPage"),
 
         const SizedBox(width: 10),
 
         // NEXT
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFFF6725),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-          ),
-          onPressed: () {},
-          child: Text(
-            "NEXT",
-            style: GoogleFonts.inter(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-          ),
+          onPressed: () {
+            setState(() {
+              currentPage++;
+              body = PropertyListBodyModel(
+                size: 6,
+                pageNo: currentPage,
+                sortBy: 'createdAt',
+                sortOrder: 'desc',
+              );
+            });
+          },
+          child: const Text("NEXT"),
         ),
-        SizedBox(width: 20.w),
       ],
     );
   }
 }
 
-class PropertyCard extends StatelessWidget {
-  const PropertyCard({super.key});
+class PropertyCard extends StatefulWidget {
+  final ListElement property;
+  const PropertyCard({super.key, required this.property});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // IMAGE
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                child: Image.network(
-                  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
-                  height: 100.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "3 BHK Apartment in Vaishali Nagar",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12.sp,
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "Vaishali Nagar, Jaipur • 1200 sqft",
-                      style: GoogleFonts.inter(
-                        fontSize: 10.sp,
-                        color: Color.fromARGB(204, 0, 0, 0),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // TAGS
-                    Row(children: [_tag("3 BHK"), _tag("Apartment")]),
-
-                    const SizedBox(height: 6),
-
-                    // PRICE
-                    Text(
-                      "₹45L",
-                      style: GoogleFonts.inter(
-                        color: Color(0xFFFF6725),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15.sp,
-                      ),
-                    ),
-
-                    const SizedBox(height: 5),
-
-                    // BUTTONS
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.r),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => DetailsPage(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              "View",
-                              style: GoogleFonts.inter(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFF6725),
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.r),
-                              ),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              "Contact",
-                              style: GoogleFonts.inter(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  State<PropertyCard> createState() => _PropertyCardState();
 
   static Widget _tag(String text) {
     return Container(
       margin: const EdgeInsets.only(right: 6),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: Color.fromARGB(127, 138, 56, 245),
+        color: const Color.fromARGB(127, 138, 56, 245),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(text, style: const TextStyle(fontSize: 11)),
+    );
+  }
+}
+
+class _PropertyCardState extends State<PropertyCard> {
+  void showContactBottomSheet(BuildContext context, dynamic propertyData) {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    String? nameError;
+    String? emailError;
+    String? phoneError;
+    bool agreeToContact = false;
+    bool interestedHomeLoan = false; // Ye optional rahega
+    bool isLoading = false;
+    const primaryColor = Color(0xffFF6A2A);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Container(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 15,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 45,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Contact Details",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+
+                    // --- NAME FIELD ---
+                    TextField(
+                      controller: nameController,
+                      onChanged: (v) => setDialogState(() => nameError = null),
+                      decoration: InputDecoration(
+                        labelText: "Full Name",
+                        errorText: nameError,
+                        prefixIcon: const Icon(
+                          Icons.person_outline,
+                          color: primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // --- EMAIL FIELD ---
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (v) => setDialogState(() => emailError = null),
+                      decoration: InputDecoration(
+                        labelText: "Email Address",
+                        errorText: emailError,
+                        prefixIcon: const Icon(
+                          Icons.email_outlined,
+                          color: primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // --- PHONE FIELD ---
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      maxLength: 10,
+                      onChanged: (v) => setDialogState(() => phoneError = null),
+                      decoration: InputDecoration(
+                        labelText: "Phone Number",
+                        errorText: phoneError,
+                        counterText: "",
+                        prefixIcon: const Icon(
+                          Icons.phone_outlined,
+                          color: primaryColor,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // --- REQUIRED CHECKBOX ---
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        "I agree to be contacted (Required)",
+                        style: TextStyle(
+                          // Agar user bhool jaye toh text red ho jayega
+                          color: agreeToContact == "Please check the agreement"
+                              ? Colors.red
+                              : Colors.black87,
+                          fontSize: 14,
+                        ),
+                      ),
+                      value: agreeToContact,
+                      activeColor: primaryColor,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (val) {
+                        setDialogState(() {
+                          agreeToContact = val ?? false;
+                          if (agreeToContact)
+                            nameError = null; // Clear error if checked
+                        });
+                      },
+                    ),
+
+                    // --- OPTIONAL CHECKBOX (Home Loan) ---
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(
+                        "Interested in Home Loan (Optional)",
+                        style: TextStyle(color: Colors.black87, fontSize: 14),
+                      ),
+                      value: interestedHomeLoan,
+                      activeColor: primaryColor,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (val) => setDialogState(
+                        () => interestedHomeLoan = val ?? false,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // --- SUBMIT BUTTON ---
+                    Consumer(
+                      builder: (context, ref, child) {
+                        return SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    bool isValid = true;
+
+                                    setDialogState(() {
+                                      // 1. Name Validation
+                                      if (nameController.text.trim().isEmpty) {
+                                        nameError = "Name is required";
+                                        isValid = false;
+                                      }
+                                      // 2. Email Validation
+                                      if (emailController.text.trim().isEmpty) {
+                                        emailError = "Email is required";
+                                        isValid = false;
+                                      } else if (!emailController.text.contains(
+                                        "@",
+                                      )) {
+                                        emailError = "Enter a valid email";
+                                        isValid = false;
+                                      }
+                                      // 3. Phone Validation
+                                      if (phoneController.text.trim().length <
+                                          10) {
+                                        phoneError =
+                                            "Enter 10 digit phone number";
+                                        isValid = false;
+                                      }
+                                      // 4. Checkbox Validation (Important!)
+                                      if (!agreeToContact) {
+                                        // Hum nameError variable ka use karke alert de sakte hain ya toast dikha sakte hain
+                                        nameError =
+                                            "Please check the agreement";
+                                        isValid = false;
+                                      }
+                                    });
+
+                                    if (!isValid) return;
+
+                                    setDialogState(() => isLoading = true);
+                                    try {
+                                      final body = SaveContactInPropertyBodyModel(
+                                        email: emailController.text,
+                                        name: nameController.text,
+                                        phone: phoneController.text,
+                                        propertyId: propertyData.id.toString(),
+                                        // Aapka API agar homeLoan support karta hai toh yaha bhej sakte hain
+                                      );
+
+                                      final service = APIStateNetwork(
+                                        createDio(),
+                                      );
+                                      final response = await service
+                                          .saveContactInProperty(body);
+
+                                      if (response.code == 0 ||
+                                          response.error == false) {
+                                        Fluttertoast.showToast(
+                                          msg: response.message ?? "Success",
+                                        );
+                                        ref.invalidate(
+                                          getMyPropertyContantListController,
+                                        );
+                                        Navigator.pop(context);
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          msg: response.message ?? "Error",
+                                        );
+                                      }
+                                    } catch (e) {
+                                      debugPrint("Error: $e");
+                                    } finally {
+                                      setDialogState(() => isLoading = false);
+                                    }
+                                  },
+                            child: isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "SUBMIT",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl =
+        (widget.property.uploadedPhotos != null &&
+            widget.property.uploadedPhotos!.isNotEmpty)
+        ? widget.property.uploadedPhotos!.first
+        : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // IMAGE
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) =>
+                      PerticulerPropertyPage(data: widget.property),
+                ),
+              );
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
+              child: Image.network(
+                imageUrl,
+                height: 100.h,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return Image.network(
+                    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
+                    height: 100.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // TITLE
+                Text(
+                  "${widget.property.bedRoom ?? ""} BHK ${widget.property.propertyType ?? ""} in ${widget.property.localityArea ?? ""}",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12.sp,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // LOCATION + AREA
+                Text(
+                  "${widget.property.localityArea ?? ""}, ${widget.property.city ?? ""} • ${widget.property.area ?? ""} sqft",
+                  style: GoogleFonts.inter(
+                    fontSize: 10.sp,
+                    color: const Color.fromARGB(204, 0, 0, 0),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                // TAGS
+                Row(
+                  children: [
+                    if (widget.property.bedRoom != null)
+                      PropertyCard._tag("${widget.property.bedRoom} BHK"),
+                    if (widget.property.propertyType != null)
+                      PropertyCard._tag(widget.property.propertyType!),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                // PRICE
+                Text(
+                  "₹${widget.property.price ?? "0"}",
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFFF6725),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15.sp,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.r),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) =>
+                                  PerticulerPropertyPage(data: widget.property),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "View",
+                          style: GoogleFonts.inter(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFFF6725),
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.r),
+                          ),
+                        ),
+                        onPressed: () {
+                          showContactBottomSheet(context, widget.property);
+                        },
+                        child: Text(
+                          "Contact",
+                          style: GoogleFonts.inter(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

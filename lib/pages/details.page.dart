@@ -636,21 +636,21 @@ class _DetailsPageState extends State<DetailsPage> {
               ),
             ),
 
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(12),
-              itemCount: 2,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12.h,
-                crossAxisSpacing: 12.w,
-                childAspectRatio: 0.60,
-              ),
-              itemBuilder: (context, index) {
-                return const PropertyCard();
-              },
-            ),
+            // GridView.builder(
+            //   shrinkWrap: true,
+            //   physics: NeverScrollableScrollPhysics(),
+            //   padding: EdgeInsets.all(12),
+            //   itemCount: 2,
+            //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //     crossAxisCount: 2,
+            //     mainAxisSpacing: 12.h,
+            //     crossAxisSpacing: 12.w,
+            //     childAspectRatio: 0.60,
+            //   ),
+            //   itemBuilder: (context, index) {
+            //     return const PropertyCard();
+            //   },
+            // ),
 
             /// 🔹 Action Button
             Container(

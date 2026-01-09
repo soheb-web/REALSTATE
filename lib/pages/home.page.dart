@@ -1256,7 +1256,7 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
   }
 
   Widget SavedScreen() {
-    final getMyPropertyProvider = ref.watch(getMyPropertyContantListController);
+    //final getMyPropertyProvider = ref.watch(getMyPropertyContantListController);
     final likeProvider = ref.watch(likePropertyController);
     return SafeArea(
       top: false,

@@ -600,7 +600,7 @@ class _AppDrawerState extends ConsumerState<AppDrawer> {
           SizedBox(height: 15.h),
           Text(
             // user.data!.name ?? "Guest User",
-            box.get("name").toString(),
+            box.get("name").toString() ?? "User",
             style: GoogleFonts.inter(
               color: Colors.white,
               fontSize: 18.sp,

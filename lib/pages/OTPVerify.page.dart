@@ -45,6 +45,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
           (route) => false,
         );
       } else {
+        otpController.clear();
         Fluttertoast.showToast(msg: response.message ?? "Error");
       }
     } catch (e, st) {

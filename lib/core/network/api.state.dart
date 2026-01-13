@@ -23,11 +23,12 @@ import 'package:realstate/Model/myBookingServiceRequestResModel.dart';
 import 'package:realstate/Model/registerResModel.dart';
 import 'package:realstate/Model/saveContactInPropertyBodyModel.dart';
 import 'package:realstate/Model/saveContactInPropertyResModel.dart';
-import 'package:realstate/Model/uploadImageBodyModel.dart';
 import 'package:realstate/Model/uploadImageResModel.dart';
 import 'package:realstate/Model/userProfileResModel.dart';
+import 'package:realstate/Model/verfiyServiceAgenetBodyModel.dart';
 import 'package:realstate/Model/verifyBodyModel.dart';
 import 'package:realstate/Model/verifyResModel.dart';
+import 'package:realstate/Model/verifyServiceAgenetResModel.dart';
 import 'package:retrofit/retrofit.dart';
 import '../../Model/Body/PropertyListBodyModel.dart';
 import '../../Model/CityResponseModel.dart';
@@ -39,7 +40,6 @@ import '../../Model/getPropertyResponsemodel.dart';
 part 'api.state.g.dart'; // File name ke hisab se .g.dart
 
 @RestApi(baseUrl: 'https://api.propertyleinnovation.com/api/v1')
-//@RestApi(baseUrl: 'http://192.168.1.22:9999/api/v1')
 //@RestApi(baseUrl: 'http://192.168.1.22:9999/api/v1')
 abstract class APIStateNetwork {
   factory APIStateNetwork(Dio dio, {String baseUrl}) = _APIStateNetwork;
@@ -127,4 +127,9 @@ abstract class APIStateNetwork {
 
   @POST("/user/BookingServices")
   Future<MyBookingServiceRequestResModel> MyRequestBookingService();
+
+  @POST("/user/verifyServiceAgent")
+  Future<VerifyServiceAgentResModel> verifyServiceAgent(
+    @Body() VerifyServiceAgentBodyModel body,
+  );
 }

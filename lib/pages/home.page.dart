@@ -1445,7 +1445,7 @@ class _RealEstateHomePageState extends ConsumerState<RealEstateHomePage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
+          CupertinoPageRoute(
             builder: (context) => PropertyPageCat(property: title),
           ),
         );

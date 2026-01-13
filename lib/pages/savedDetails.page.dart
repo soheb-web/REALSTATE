@@ -492,7 +492,7 @@ class _SavedDetailsPageState extends State<SavedDetailsPage> {
                           radius: 25.r,
                           backgroundColor: primaryColor,
                           child: Text(
-                            data.fullName![0].toUpperCase() ?? "",
+                            data.fullName?[0].toUpperCase() ?? "",
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),

@@ -29,6 +29,7 @@
         "marquee",
         "otp_pin_field",
         "permission_handler",
+        "photo_view",
         "pretty_dio_logger",
         "retrofit",
         "riverpod",
@@ -129,6 +130,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "photo_view",
+      "version": "0.15.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {

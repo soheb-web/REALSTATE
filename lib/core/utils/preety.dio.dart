@@ -26,6 +26,7 @@ Dio createDio() {
         final token = box.get("token"); // 🔥 har request par fresh token
 
         options.headers.addAll({
+          'Content-Type': 'application/json',
           'Accept': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         });
@@ -69,8 +70,6 @@ Dio createDio() {
       //   }
       //   return handler.next(error);
       // },
-     
-     
       onError: (DioException error, handler) async {
         // 🔹 Case 1: Server / Internet issue
         if (error.type == DioExceptionType.connectionError ||
